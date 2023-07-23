@@ -119,6 +119,19 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         data.last_review = new Date(data.last_review);
         const response = FsrsOptions.indexOf(optionStr);
 
+        let correct = true;
+        if (response == 0) {
+            // Again
+            correct = false;
+        }
+
+        if (repeat) {
+            return {
+                correct,
+                nextReview: -1,
+            };
+        }
+
         if (!this.initFlag) {
             this.getLogfilepath();
             this.updateFsrsParams();
@@ -140,23 +153,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         //Get the review log after rating `Good`:
         // review_log = scheduling_cards[2].review_log;
 
-        let correct = true;
         const nextInterval = item.data.due.valueOf() - item.data.last_review.valueOf();
-        if (repeat) {
-            if (response == 0) {
-                correct = false;
-            }
-
-            return {
-                correct,
-                nextReview: -1,
-            };
-        }
-
-        if (response == 0) {
-            // Again
-            correct = false;
-        }
 
         this.appendRevlog(now, item, response);
 

@@ -209,10 +209,7 @@ export default class SRPlugin extends Plugin {
                                 item.setIcon("plus-with-circle");
                                 item.setTitle("Track Note");
                                 item.onClick((_evt) => {
-                                    this.store.trackFile(
-                                        fileish.path,
-                                        this.store.getDefaultDackName()
-                                    );
+                                    this.store.trackFile(fileish.path);
                                 });
                             });
                         }
@@ -966,6 +963,10 @@ export default class SRPlugin extends Plugin {
 
             return;
         }
+
+        // add repeat items to review.
+        this.store.loadRepeatQueue(this.reviewDecks);
+
         const queue = this.store.data.toDayAllQueue;
         const len = Object.keys(queue).length;
         this.dueNotesCount_real = len;
