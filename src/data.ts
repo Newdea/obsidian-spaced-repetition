@@ -922,9 +922,9 @@ export class DataStore {
         trackedFile.items = newItems;
         this.save();
 
-        if (notice) {
-            new Notice("Added " + added + " new items, removed " + removed + " items.");
-        }
+        // if (notice) {
+        //     new Notice("Added " + added + " new items, removed " + removed + " items.");
+        // }
         return { added, removed };
     }
 
