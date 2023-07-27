@@ -22,6 +22,7 @@ export class RevLog {
     r: number;
     time: number;
     type: number;
+    tag: string;
 
     constructor() {
         return;
@@ -50,7 +51,13 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     filename = "ob_revlog.csv";
     logfilepath: string = null;
     REVLOG_sep = ", ";
-    REVLOG_TITLE = "id" + this.REVLOG_sep + "cid" + this.REVLOG_sep + "r\n";
+    REVLOG_TITLE = () => {
+        let title = "";
+        Object.keys(RevLog).forEach((key) => {
+            title += key.toString() + this.REVLOG_sep;
+        });
+        return title + "\n";
+    };
 
     constructor() {
         super();
@@ -182,17 +189,12 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         rlog.time = 0;
         rlog.type = carddata.state;
 
-        let data =
-            rlog.id +
-            this.REVLOG_sep +
-            rlog.cid +
-            this.REVLOG_sep +
-            rlog.r +
-            this.REVLOG_sep +
-            rlog.time +
-            this.REVLOG_sep +
-            rlog.type +
-            "\n";
+        let data = "";
+        Object.values(rlog).forEach((value) => {
+            data += value.toString() + this.REVLOG_sep;
+        });
+        data += "\n";
+
         if (!(await adapter.exists(this.logfilepath))) {
             data = this.REVLOG_TITLE + data;
         }
