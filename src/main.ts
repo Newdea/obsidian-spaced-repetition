@@ -542,7 +542,7 @@ export default class SRPlugin extends Plugin {
             console.log(`SR: ${t("EASES")}`, this.easeByPath);
             console.log(`SR: ${t("DECKS")}`, this.deckTree);
             console.log(`SR: NOTE ${t("DECKS")}`, this.reviewDecks);
-            console.log(`SR: this.dueDatesNotes`, this.dueDatesNotes);
+            console.log("SR: this.dueDatesNotes", this.dueDatesNotes);
         }
 
         for (const deckKey in this.reviewDecks) {
@@ -1354,7 +1354,7 @@ export default class SRPlugin extends Plugin {
                     `---\n${schedulingInfo[1]}` + `${schedulingInfo[5]}---`
                 );
             } else {
-                fileText = fileText.replace(SCHEDULING_INFO_REGEX, ``);
+                fileText = fileText.replace(SCHEDULING_INFO_REGEX, "");
             }
             await this.app.vault.modify(note, fileText);
         }

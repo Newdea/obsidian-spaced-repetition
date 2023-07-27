@@ -92,6 +92,7 @@ export interface SRSettings {
     repeatItems: boolean;
     trackedNoteToDecks: boolean;
     algorithm: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     algorithmSettings: any;
 }
 
@@ -741,6 +742,7 @@ export class SRSettingTab extends PluginSettingTab {
 
         // Add algorithm specific settings
         // containerEl.createEl("h3").innerText = "Trackfile Algorithm Settings";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         plugin.algorithm.displaySettings(containerEl, (settings: any) => {
             plugin.data.settings.algorithmSettings[plugin.data.settings.algorithm] = settings;
             plugin.savePluginData();
@@ -822,10 +824,10 @@ export class SRSettingTab extends PluginSettingTab {
             const btnTextEl = new Setting(containerEl)
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                .setName(t(opt.toUpperCase()))
+                .setName(t("FLASHCARD_" + opt.toUpperCase() + "_LABEL"))
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                .setDesc(t(opt.toUpperCase() + "_DESC"));
+                .setDesc(t("FLASHCARD_" + opt.toUpperCase() + "_DESC"));
             btnTextEl.addText((text) =>
                 text.setValue(btnText[algo][ind]).onChange((value) => {
                     applySettingsUpdate(async () => {
