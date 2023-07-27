@@ -13,10 +13,13 @@ export class reviewNoteResponseModal {
     buttons: HTMLButtonElement[];
     responseInterval: number[];
     showInterval = true;
+    buttonTexts: string[];
 
     constructor(plugin: SRPlugin) {
         this.plugin = plugin;
         this.settings = plugin.data.settings;
+        const algo = plugin.data.settings.algorithm;
+        this.buttonTexts = plugin.data.settings.responseOptionBtnsText[algo];
 
         // this.display(show, responseInterval);
     }
@@ -35,21 +38,8 @@ export class reviewNoteResponseModal {
 
             this.plugin.algorithm.srsOptions().forEach((opt, index) => {
                 const btn = document.getElementById("sr-" + opt.toLowerCase() + "-btn");
-                let text = opt;
-                if (this.showInterval) {
-                    text =
-                        responseInterval == null
-                            ? `${opt}`
-                            : Platform.isMobile
-                            ? textInterval(
-                                  Number.parseFloat(responseInterval[index].toFixed(5)),
-                                  true
-                              )
-                            : `${opt} - ${textInterval(
-                                  Number.parseFloat(responseInterval[index].toFixed(5)),
-                                  false
-                              )}`;
-                }
+                // let text = btnText[algo][index];
+                const text = this.getTextWithInterval(index, responseInterval);
                 btn.setText(text);
             });
             return;
@@ -75,6 +65,7 @@ export class reviewNoteResponseModal {
         document.body
             .querySelector(".mod-vertical.mod-root")
             .insertAdjacentElement("afterbegin", this.containerEl);
+
         this.buttons = [];
         options.forEach((opt: string, index) => {
             const btn = document.createElement("button");
@@ -83,18 +74,8 @@ export class reviewNoteResponseModal {
             // btn.setAttribute("aria-label", "Hotkey: " + (index + 1));
             // btn.setAttribute("style", `width: calc(95%/${buttonCounts});`);
             // setIcon(btn, item.icon);
-            let text = opt;
-            if (this.showInterval) {
-                text =
-                    responseInterval == null
-                        ? `${opt}`
-                        : Platform.isMobile
-                        ? textInterval(Number.parseFloat(responseInterval[index].toFixed(5)), true)
-                        : `${opt} - ${textInterval(
-                              Number.parseFloat(responseInterval[index].toFixed(5)),
-                              false
-                          )}`;
-            }
+            // let text = btnText[algo][index];
+            const text = this.getTextWithInterval(index, responseInterval);
             btn.setText(text);
             btn.addEventListener("click", () => buttonClick(opt));
             this.buttons.push(btn);
@@ -163,7 +144,24 @@ export class reviewNoteResponseModal {
             }
         };
  */
+
         this.containerEl.style.visibility = "visible"; // : "hidden"
+    }
+
+    private getTextWithInterval(index: number, responseInterval: number[]) {
+        let text = this.buttonTexts[index];
+        if (this.showInterval) {
+            text =
+                responseInterval == null
+                    ? `${text}`
+                    : Platform.isMobile
+                    ? textInterval(Number.parseFloat(responseInterval[index].toFixed(5)), true)
+                    : `${text} - ${textInterval(
+                          Number.parseFloat(responseInterval[index].toFixed(5)),
+                          false
+                      )}`;
+        }
+        return text;
     }
 
     public display(show = true, responseInterval?: number[]): void {
