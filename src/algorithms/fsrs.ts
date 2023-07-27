@@ -62,7 +62,10 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         return {
             request_retention: 0.9,
             maximum_interval: 36500,
-            w: [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61],
+            w: [
+                0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34,
+                1.26, 0.29, 2.61,
+            ],
         };
     }
 
@@ -101,8 +104,8 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const scheduling_cards = this.fsrs.repeat(card, now);
         const intvls: number[] = [];
         this.srsOptions().forEach((opt, ind) => {
-            const due = scheduling_cards[ind].card.due.valueOf();
-            const lastrv = scheduling_cards[ind].card.last_review.valueOf();
+            const due = scheduling_cards[ind + 1].card.due.valueOf();
+            const lastrv = scheduling_cards[ind + 1].card.last_review.valueOf();
             const nextInterval = due - lastrv;
             intvls.push(nextInterval / DateUtils.DAYS_TO_MILLIS);
             // console.debug("due:" + due + ", last: " + lastrv + ", intvl: " + nextInterval);
@@ -299,7 +302,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         update(this.settings);
                     });
             });
-            
+
         new Setting(containerEl)
             .setName("w")
             .setDesc("w")
