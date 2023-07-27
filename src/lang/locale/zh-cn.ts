@@ -145,6 +145,19 @@ export default {
     REVIEW_NOTE_DIRECTLY_DESC: "复习笔记时, 不必选择标签（多个复习标签的情况）就直接打开笔记",
     INTERVAL_SHOWHIDE: "显示复习间隔",
     INTERVAL_SHOWHIDE_DESC: "是否在按键上显示复习间隔",
+    REQUEST_RETENTION: "保留度",
+    REQUEST_RETENTION_DESC: "在下次进行复习时，你期望能回想起答案的概率（百分比）",
+    REVLOG_TAGS: "输出到日志的标签",
+    REVLOG_TAGS_DESC: "用于输出到日志的标签, 卡片或笔记的标签都行",
+
+    FLASHCARD_AGAIN_LABEL: "重来 按钮文本",
+    FLASHCARD_BLACKOUT_LABEL: "忘记 按钮文本",
+    FLASHCARD_INCORRECT_LABEL: "猜错 按钮文本",
+    "FLASHCARD_INCORRECT (EASY)_LABEL": "猜错（简单） 按钮文本",
+    FLASHCARD_AGAIN_DESC: "自定义“重来”按钮的标签",
+    FLASHCARD_BLACKOUT_DESC: "自定义“忘记”按钮的标签",
+    FLASHCARD_INCORRECT_DESC: "自定义“猜错”按钮的标签",
+    "FLASHCARD_INCORRECT (EASY)_DESC": "自定义“猜错（简单）”按钮的标签",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "笔记复习序列",

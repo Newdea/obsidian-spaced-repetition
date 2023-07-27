@@ -158,6 +158,20 @@ export default {
         "when reviewing note via click statusbar or command, open it directly without having to select a tag to open a note",
     INTERVAL_SHOWHIDE: "Display Next Review Interval",
     INTERVAL_SHOWHIDE_DESC: "whether to display next revivew iterval on the response buttons.",
+    REQUEST_RETENTION: "Request_retention",
+    REQUEST_RETENTION_DESC:
+        "The probability (percentage) that you expect to recall the answer the next time you review",
+    REVLOG_TAGS: "Tags for output review log",
+    REVLOG_TAGS_DESC: "Tags for output review log, could be flashcards tags or/and notes tags",
+
+    FLASHCARD_AGAIN_LABEL: "Again Button Text",
+    FLASHCARD_BLACKOUT_LABEL: "Blackout Button Text",
+    FLASHCARD_INCORRECT_LABEL: "Incorrect Button Text",
+    "FLASHCARD_INCORRECT (EASY)_LABEL": "Incorrect (Easy) Button Text",
+    FLASHCARD_AGAIN_DESC: 'Customize the label for the "Again" Button',
+    FLASHCARD_BLACKOUT_DESC: 'Customize the label for the "Blackout" Button',
+    FLASHCARD_INCORRECT_DESC: 'Customize the label for the "Incorrect" Button',
+    "FLASHCARD_INCORRECT (EASY)_DESC": 'Customize the label for the "Incorrect (Easy)" Button',
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "Notes Review Queue",

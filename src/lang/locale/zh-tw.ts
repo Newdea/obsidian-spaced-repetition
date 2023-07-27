@@ -144,6 +144,19 @@ export default {
     REVIEW_NOTE_DIRECTLY_DESC: "復習筆記時, 不必選擇標籤（多個復習標籤的情況）就直接打開筆記",
     INTERVAL_SHOWHIDE: "顯示復習間隔",
     INTERVAL_SHOWHIDE_DESC: "是否在按鍵上顯示復習間隔",
+    REQUEST_RETENTION: "保留度",
+    REQUEST_RETENTION_DESC: "在下次進行復習時，你期望能回想起答案的概率（百分比）",
+    REVLOG_TAGS: "輸出到日誌的標籤",
+    REVLOG_TAGS_DESC: "用於輸出到日誌的標籤, 卡片或筆記的標籤都行",
+
+    FLASHCARD_AGAIN_LABEL: "重來 按鈕文本",
+    FLASHCARD_BLACKOUT_LABEL: "忘記 按鈕文本",
+    FLASHCARD_INCORRECT_LABEL: "猜錯 按鈕文本",
+    "FLASHCARD_INCORRECT (EASY)_LABEL": "猜錯（簡單） 按鈕文本",
+    FLASHCARD_AGAIN_DESC: "自定義“重來”按鈕的標籤",
+    FLASHCARD_BLACKOUT_DESC: "自定義“忘記”按鈕的標籤",
+    FLASHCARD_INCORRECT_DESC: "自定義“猜錯”按鈕的標籤",
+    "FLASHCARD_INCORRECT (EASY)_DESC": "自定義“猜錯（簡單）”按鈕的標籤",
 
     // sidebar.ts
     NOTES_REVIEW_QUEUE: "筆記復習序列",

@@ -16,6 +16,7 @@ const Sm2Options: string[] = ["Blackout", "Incorrect", "Incorrect (Easy)", "Hard
  * https://www.supermemo.com/en/archives1990-2015/english/ol/sm2
  */
 export class Sm2Algorithm extends SrsAlgorithm {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultSettings(): any {
         return {};
     }
@@ -92,6 +93,7 @@ export class Sm2Algorithm extends SrsAlgorithm {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     displaySettings(containerEl: HTMLElement, update: (settings: any) => void): void {
         containerEl.createDiv().innerHTML =
             '用于间隔重复的算法. 目前与Anki算法共用参数（仅算法处理方式不同），更多信息请查阅 <a href="https://www.supermemo.com/en/archives1990-2015/english/ol/sm2">sm2算法</a>.';
