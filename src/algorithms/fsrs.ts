@@ -30,6 +30,7 @@ export class RevLog {
 }
 
 interface FsrsSettings {
+    revlog_tags: string[];
     request_retention: number;
     maximum_interval: number;
     w: number[];
@@ -67,6 +68,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     defaultSettings(): FsrsSettings {
         return {
+            revlog_tags: ["#review"],
             request_retention: 0.9,
             maximum_interval: 36500,
             w: [
@@ -179,6 +181,10 @@ export class FsrsAlgorithm extends SrsAlgorithm {
      * @param rating
      */
     async appendRevlog(now: Date, item: RepetitionItem, rating: number) {
+        
+        if(!this.settings.revlog_tags.includes(item.deckName)) {
+            return;
+        }
         const plugin = this.plugin;
         const adapter = plugin.app.vault.adapter;
         const rlog = new RevLog();
@@ -235,6 +241,19 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         }
         containerEl.createDiv().innerHTML =
             '用于间隔重复的算法. 更多信息请查阅 <a href="https://github.com/open-spaced-repetition/fsrs.js">FSRS算法</a>.';
+
+        new Setting(containerEl)
+            .setName(t("REVLOG_TAGS"))
+            .setDesc(t("REVLOG_TAGS_DESC"))
+            .addTextArea((text) =>
+                text.setValue(this.settings.revlog_tags.join(" ")).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.settings.revlog_tags = value.split(/\s+/);
+                        await this.plugin.savePluginData();
+                    });
+                })
+            );
+
         new Setting(containerEl)
             .setName("request_retention")
             .setDesc("request_retention")
