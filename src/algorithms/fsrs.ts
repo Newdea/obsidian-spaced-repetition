@@ -181,8 +181,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
      * @param rating
      */
     async appendRevlog(now: Date, item: RepetitionItem, rating: number) {
-        
-        if(!this.settings.revlog_tags.includes(item.deckName)) {
+        if (!this.settings.revlog_tags.includes(item.deckName)) {
             return;
         }
         const plugin = this.plugin;
@@ -255,8 +254,8 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             );
 
         new Setting(containerEl)
-            .setName("request_retention")
-            .setDesc("request_retention")
+            .setName(t("REQUEST_RETENTION"))
+            .setDesc(t("REQUEST_RETENTION_DESC"))
             .addSlider((slider) =>
                 slider
                     .setLimits(50, 100, 1)
