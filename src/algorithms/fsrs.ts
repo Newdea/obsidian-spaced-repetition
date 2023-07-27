@@ -237,26 +237,15 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         new Setting(containerEl)
             .setName("request_retention")
             .setDesc("request_retention")
-            .addText((text) =>
-                text
-                    .setPlaceholder("request_retention")
-                    .setValue(this.settings.request_retention.toString())
-                    .onChange((newValue) => {
-                        applySettingsUpdate(async () => {
-                            const numValue: number = Number.parseFloat(newValue);
-                            if (!isNaN(numValue) && numValue > 0) {
-                                if (numValue < 1.0) {
-                                    new Notice(t("EASY_BONUS_MIN_WARNING"));
-                                    text.setValue(this.settings.request_retention.toString());
-                                    return;
-                                }
-                                this.settings.request_retention = this.fsrs.p.request_retention =
-                                    numValue;
-                                update(this.settings);
-                            } else {
-                                new Notice(t("VALID_NUMBER_WARNING"));
-                            }
-                        });
+            .addSlider((slider) =>
+                slider
+                    .setLimits(50, 100, 1)
+                    .setValue(this.settings.request_retention * 100)
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.settings.request_retention = this.fsrs.p.request_retention =
+                            value / 100;
+                        await this.plugin.savePluginData();
                     })
             )
             .addExtraButton((button) => {
