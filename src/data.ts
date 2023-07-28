@@ -785,9 +785,7 @@ export class DataStore {
         });
         this.save();
 
-        console.log(
-            "Tracked: " + note.path + "lineNo:" + lineNo + " Added " + data.added + " new items"
-        );
+        console.log("Tracked: " + note.path + "lineNo:" + lineNo);
 
         return newcardItem;
     }
@@ -1458,7 +1456,7 @@ export class DataStore {
         if (this.isNewAdd(fileid) >= 0) {
             rdeck.newNotes.push(note);
             this.plugin.newNotesCount++;
-            console.debug("syncRCDataToSRrevDeck : addNew", fileid);
+            // console.debug("syncRCDataToSRrevDeck : addNew", fileid);
         } else {
             rdeck.scheduledNotes.push({ note: note, dueUnix: item.nextReview });
             if (item.nextReview <= nowToday) {
@@ -1703,11 +1701,7 @@ export class DataStore {
             }
         } else if (tagtype === "card") {
             for (const tag of tags) {
-                if (
-                    this.plugin.data.settings.flashcardTags.some(
-                        (flashcardTag) => tag === flashcardTag || tag.startsWith(flashcardTag + "/")
-                    )
-                ) {
+                if (this.isTagedDeckName(tag)) {
                     shouldIgnore = false;
                     break;
                 }
@@ -1733,6 +1727,19 @@ export class DataStore {
         }
 
         return true;
+    }
+
+    isTagedDeckName(deckName: string) {
+        let isTaged = false;
+        if (
+            this.plugin.data.settings.flashcardTags.some(
+                (flashcardTag) =>
+                    deckName === flashcardTag || deckName.startsWith(flashcardTag + "/")
+            )
+        ) {
+            isTaged = true;
+        }
+        return isTaged;
     }
 
     /**
@@ -1769,6 +1776,9 @@ export class DataStore {
                 this.setSchedbyId(carditem.itemIds[i], scheduling[i]);
             }
         } else {
+            if (!this.isTagedDeckName(deckName)) {
+                deckName = this.getDefaultDackName();
+            }
             this.updateCardItems(note, carditem, count, deckName);
             carditem.itemIds.forEach((id) => {
                 const sched = this.getSchedbyId(id);
