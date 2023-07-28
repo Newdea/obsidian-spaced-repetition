@@ -181,6 +181,12 @@ const NEW_ITEM: RepetitionItem = {
     data: {},
 };
 
+const DEFAULT_NEW_CARDINFO: CardInfo = {
+    lineNo: 0,
+    cardTextHash: "",
+    itemIds: [],
+};
+
 /**
  * DataStore.
  */
@@ -754,38 +760,33 @@ export class DataStore {
      * @param note
      * @param lineNo
      * @param cardTextHash
-     * @param count
-     * @param notice
      * @returns {CardInfo} cardInfo of new add.
      */
-    trackFileCard(
-        note: TFile,
-        lineNo: number,
-        cardTextHash: string,
-        count: number,
-        notice?: boolean
-    ): CardInfo {
+    trackFileCard(note: TFile, lineNo: number, cardTextHash: string): CardInfo {
         if (!this.isTrackedCardfile(note.path)) {
             console.log("Attempt to add card in untracked file: " + note.path);
             this.trackFile(note.path, RPITEMTYPE.CARD, false);
         }
         const trackedFile = this.getTrackedFile(note.path);
 
-        const newcardItem: CardInfo = { lineNo: lineNo, cardTextHash: cardTextHash, itemIds: [] };
+        // const newcardItem: CardInfo = { lineNo: lineNo, cardTextHash: cardTextHash, itemIds: [] };
+        const newcardItem: CardInfo = deepcopy(DEFAULT_NEW_CARDINFO);
+        newcardItem.lineNo = lineNo;
+        newcardItem.cardTextHash = cardTextHash;
 
         if (!Object.prototype.hasOwnProperty.call(trackedFile, "cardItems")) {
             // didn't have cardItems
             trackedFile.cardItems = [];
         }
 
-        const cind = trackedFile.cardItems.push(newcardItem) - 1;
+        const _cind = trackedFile.cardItems.push(newcardItem) - 1;
         // const data = this.updateCardItems(note, trackedFile.cardItems[cind], count, deckName,notice);
         trackedFile.cardItems.sort((a, b) => {
             return a.lineNo - b.lineNo;
         });
         this.save();
 
-        console.log("Tracked: " + note.path + "lineNo:" + lineNo);
+        console.log("Tracked: " + note.path + ", lineNo:" + lineNo + 1); // +1 just for better read.
 
         return newcardItem;
     }
@@ -1765,7 +1766,11 @@ export class DataStore {
 
         let carditem = this.getAndSyncCardInfo(note, lineNo, cardTextHash);
         if (carditem == null) {
-            carditem = this.trackFileCard(note, lineNo, cardTextHash, count);
+            carditem = this.trackFileCard(note, lineNo, cardTextHash);
+            if (!this.isTagedDeckName(deckName)) {
+                deckName = this.getDefaultDackName();
+            }
+            this.updateCardItems(note, carditem, count, deckName);
         }
 
         if (scheduling.length) {
