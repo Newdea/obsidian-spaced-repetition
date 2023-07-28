@@ -583,7 +583,27 @@ export class FlashcardModal extends Modal {
                     currSchedintvl_ease_old[1],
                 ]);
             }
-            store.reviewId(cardinfo.itemIds[this.currentCard.siblingIdx], opt);
+            // let deck = this.currentDeck;
+            // let taged = false;
+            // while (deck.parent.deckName !== "root") {
+            //     deck = deck.parent;
+            // }
+            // let deckName: string = "#" + deck.deckName;
+            // for (const tagToReview of this.plugin.data.settings.flashcardTags) {
+            //     if (deckName === tagToReview || deckName.startsWith(tagToReview + "/")) {
+            //         taged = true;
+            //         break;
+            //     }
+            // }
+            // if (!taged) {
+            //     deckName = store.getDefaultDackName();
+            // }
+            const id = cardinfo.itemIds[this.currentCard.siblingIdx];
+            // const item = store.getItembyID(id);
+            // if (item.deckName !== deckName) {
+            //     item.deckName = deckName;
+            // }
+            store.reviewId(id, opt);
         }
 
         for (const sibling of this.currentCard.siblings) {
