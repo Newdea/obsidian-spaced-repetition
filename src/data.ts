@@ -1767,32 +1767,20 @@ export class DataStore {
         let carditem = this.getAndSyncCardInfo(note, lineNo, cardTextHash);
         if (carditem == null) {
             carditem = this.trackFileCard(note, lineNo, cardTextHash);
-            if (!this.isTagedDeckName(deckName)) {
-                deckName = this.getDefaultDackName();
-            }
-            this.updateCardItems(note, carditem, count, deckName);
         }
 
-        if (scheduling.length) {
-            console.debug("syncTrackfileCardSched-note:", note.name, lineNo, count);
-            const schedLen = Math.min(scheduling.length, carditem.itemIds.length);
-
-            for (let i = 0; i < schedLen; i++) {
-                this.setSchedbyId(carditem.itemIds[i], scheduling[i]);
-            }
-        } else {
-            if (!this.isTagedDeckName(deckName)) {
-                deckName = this.getDefaultDackName();
-            }
-            this.updateCardItems(note, carditem, count, deckName);
-            carditem.itemIds.forEach((id) => {
-                const sched = this.getSchedbyId(id);
-                // ignore new add card
-                if (sched != null) {
-                    scheduling.push(sched);
-                }
-            });
+        if (!this.isTagedDeckName(deckName)) {
+            deckName = this.getDefaultDackName();
         }
+        this.updateCardItems(note, carditem, count, deckName);
+        carditem.itemIds.forEach((id) => {
+            const sched = this.getSchedbyId(id);
+            // ignore new add card
+            if (sched != null) {
+                scheduling.push(sched);
+            }
+        });
+
         return scheduling;
     }
 }
