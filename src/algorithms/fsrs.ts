@@ -55,7 +55,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     filename = "ob_revlog.csv";
     logfilepath: string = null;
-    REVLOG_sep = ", ";
+    REVLOG_sep = ",";
     REVLOG_TITLE = RevLog.getKeyNames().join(this.REVLOG_sep) + "\n";
 
     constructor() {
