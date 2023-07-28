@@ -139,6 +139,9 @@ export default class Commands {
                 console.log(plugin.store.data.queue);
                 console.log("There are " + plugin.store.data.queue.length + " items in queue.");
                 console.log(plugin.store.data.newAdded + " new where added to today.");
+                console.log("repeatQueue: " + plugin.store.data.repeatQueue);
+                console.log("cardQueue: " + plugin.store.data.cardQueue);
+                console.log("cardRepeatQueue: " + plugin.store.data.cardRepeatQueue);
             },
         });
 
@@ -147,7 +150,9 @@ export default class Commands {
             name: "Clear Queue",
             callback: () => {
                 plugin.store.data.queue = [];
+                plugin.store.data.repeatQueue = [];
                 plugin.store.data.cardQueue = [];
+                plugin.store.data.cardRepeatQueue = [];
             },
         });
 

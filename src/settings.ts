@@ -149,7 +149,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     dataLocation: DataLocation.PluginFolder,
     customFolder: "",
     maxNewPerDay: 20,
-    repeatItems: true,
+    repeatItems: false,
     trackedNoteToDecks: false,
     algorithm: Object.keys(algorithms)[0],
     algorithmSettings: { algorithm: Object.values(algorithms)[0].settings },

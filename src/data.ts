@@ -702,11 +702,7 @@ export class DataStore {
                 }
             } else if (child instanceof TFile && child.extension === "md") {
                 if (!this.isTracked(child.path)) {
-                    const { added, removed } = this.trackFile(
-                        child.path,
-                        this.getDefaultDackName(),
-                        false
-                    );
+                    const { added, removed } = this.trackFile(child.path, RPITEMTYPE.NOTE, false);
                     totalAdded += added;
                     totalRemoved += removed;
                 }
@@ -726,7 +722,7 @@ export class DataStore {
      */
     trackFile(
         path: string,
-        tag?: string,
+        type?: RPITEMTYPE | string,
         notice?: boolean
     ): { added: number; removed: number } | null {
         const trackedFile: TrackedFile = {
@@ -734,14 +730,19 @@ export class DataStore {
             items: {},
             tags: [],
         };
-        if (tag != null) {
-            trackedFile.tags = [tag];
-            if (tag === "card") {
+        const itemtype = RPITEMTYPE.NOTE;
+        let dname = this.getDefaultDackName();
+        if (type != null) {
+            trackedFile.tags = [type];
+            if (type === RPITEMTYPE.CARD) {
+                // itemtype = RPITEMTYPE.CARD;
                 trackedFile.cardItems = [];
+            } else if (type !== RPITEMTYPE.NOTE) {
+                dname = type as string;
             }
         }
         this.data.trackedFiles.push(trackedFile);
-        const data = this.updateItems(path, tag, notice);
+        const data = this.updateItems(path, itemtype, dname, notice);
         console.log("Tracked: " + path);
         // this.plugin.updateStatusBar();
         return data;
@@ -766,7 +767,7 @@ export class DataStore {
     ): CardInfo {
         if (!this.isTrackedCardfile(note.path)) {
             console.log("Attempt to add card in untracked file: " + note.path);
-            this.trackFile(note.path, "card", false);
+            this.trackFile(note.path, RPITEMTYPE.CARD, false);
         }
         const trackedFile = this.getTrackedFile(note.path);
 
@@ -859,17 +860,20 @@ export class DataStore {
      * updateItems.
      *
      * @param {string} path
-     * @param {string} tag? "default" , deckName
+     * @param {string} type? RPITEMTYPE
+     * @param {string} dname? "default" , deckName
      * @param {boolean} notice
      * @returns {{ added: number; removed: number } | null}
      */
     updateItems(
         path: string,
-        tag?: string,
+        type?: RPITEMTYPE,
+        dname?: string,
         notice?: boolean
     ): { added: number; removed: number } | null {
         if (notice == null) notice = true;
-        if (tag == null) tag = this.defaultDeckname;
+        if (type == null) type = RPITEMTYPE.NOTE;
+        if (dname == null) dname = this.getDefaultDackName();
 
         const ind = this.getFileIndex(path);
         if (ind == -1) {
@@ -895,7 +899,10 @@ export class DataStore {
             newItem.data = Object.assign(this.plugin.algorithm.defaultData());
             // newItem.data = Object.assign(this.algorithmdefaultData());
             newItem.fileIndex = ind;
-            newItem.deckName = tag;
+            newItem.itemType = type;
+            newItem.deckName = Object.values(RPITEMTYPE).includes(type)
+                ? this.getDefaultDackName()
+                : type;
             newItem.ID = this.data.items.push(newItem) - 1;
             newItems["file"] = newItem.ID;
             added += 1;
@@ -917,9 +924,9 @@ export class DataStore {
         trackedFile.items = newItems;
         this.save();
 
-        if (notice) {
-            new Notice("Added " + added + " new items, removed " + removed + " items.");
-        }
+        // if (notice) {
+        //     new Notice("Added " + added + " new items, removed " + removed + " items.");
+        // }
         return { added, removed };
     }
 
@@ -965,6 +972,7 @@ export class DataStore {
                 newItem.fileIndex = ind;
                 newItem.itemType = RPITEMTYPE.CARD;
                 const cardId = this.data.items.push(newItem) - 1;
+                newItem.ID = cardId;
                 newitemIds.push(cardId);
                 added += 1;
             }
@@ -1163,6 +1171,21 @@ export class DataStore {
                     removedItems +
                     " items while building queue!"
             );
+        }
+    }
+
+    loadRepeatQueue(rvdecks: { [deckKey: string]: ReviewDeck }) {
+        if (this.repeatQueueSize() > 0) {
+            // const repeatDeckCounts: Record<string, number> = {};
+            this.data.repeatQueue.forEach((id) => {
+                const dname: string = this.getItembyID(id).deckName;
+                this.data.toDayAllQueue[id] = dname;
+                // if (!Object.keys(repeatDeckCounts).includes(dname)) {
+                //     repeatDeckCounts[dname] = 0;
+                // }
+                rvdecks[dname].dueNotesCount++;
+            });
+            // return repeatDeckCounts;
         }
     }
 
@@ -1413,6 +1436,11 @@ export class DataStore {
             }
         } else {
             delete this.data.toDayAllQueue[fileid];
+            if (item.nextReview <= nowToday) {
+                this.data.toDayLatterQueue[fileid] = rdeck.deckName;
+            } else if (item.nextReview > nowToday) {
+                delete this.data.toDayLatterQueue[fileid];
+            }
             Object.keys(this.data.toDayLatterQueue).forEach((fileid) => {
                 const id = Number.parseInt(fileid);
                 if (now - this.data.items[id].nextReview > 0) {
@@ -1423,11 +1451,6 @@ export class DataStore {
                     delete this.data.toDayLatterQueue[id];
                 }
             });
-            if (item.nextReview <= nowToday) {
-                this.data.toDayLatterQueue[fileid] = rdeck.deckName;
-            } else if (item.nextReview > nowToday) {
-                delete this.data.toDayLatterQueue[fileid];
-            }
         }
 
         if (this.isNewAdd(fileid) >= 0) {
@@ -1467,6 +1490,12 @@ export class DataStore {
                 trackedFile.tags.push(rdeck.deckName);
                 this.save();
             }
+        }
+
+        // update item
+        if (item.deckName !== rdeck.deckName) {
+            item.deckName = rdeck.deckName;
+            this.save();
         }
         if (!Object.prototype.hasOwnProperty.call(item, "itemType")) {
             item.itemType = this.isCardItem(fileid) ? RPITEMTYPE.CARD : RPITEMTYPE.NOTE;
