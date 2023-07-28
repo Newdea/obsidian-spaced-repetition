@@ -779,7 +779,7 @@ export class DataStore {
         }
 
         const cind = trackedFile.cardItems.push(newcardItem) - 1;
-        const data = this.updateCardItems(note, trackedFile.cardItems[cind], count, notice);
+        // const data = this.updateCardItems(note, trackedFile.cardItems[cind], count, deckName,notice);
         trackedFile.cardItems.sort((a, b) => {
             return a.lineNo - b.lineNo;
         });
@@ -934,6 +934,7 @@ export class DataStore {
         note: TFile,
         cardinfo: CardInfo,
         count: number,
+        deckName: string = this.getDefaultDackName(),
         notice?: boolean
     ): { added: number; removed: number } | null {
         if (notice == null) notice = false;
@@ -971,6 +972,7 @@ export class DataStore {
                 newItem.data = Object.assign(this.plugin.algorithm.defaultData());
                 newItem.fileIndex = ind;
                 newItem.itemType = RPITEMTYPE.CARD;
+                newItem.deckName = deckName;
                 const cardId = this.data.items.push(newItem) - 1;
                 newItem.ID = cardId;
                 newitemIds.push(cardId);
@@ -1736,6 +1738,7 @@ export class DataStore {
     /**
      * syncTrackfileCardSched
      * @param note
+     * @param deckName
      * @param lineNo
      * @param cardTextHash
      * @param count
@@ -1743,6 +1746,7 @@ export class DataStore {
      */
     syncTrackfileCardSched(
         note: TFile,
+        deckName: string,
         lineNo: number,
         cardTextHash: string,
         count: number,
@@ -1765,7 +1769,7 @@ export class DataStore {
                 this.setSchedbyId(carditem.itemIds[i], scheduling[i]);
             }
         } else {
-            this.updateCardItems(note, carditem, count);
+            this.updateCardItems(note, carditem, count, deckName);
             carditem.itemIds.forEach((id) => {
                 const sched = this.getSchedbyId(id);
                 // ignore new add card
