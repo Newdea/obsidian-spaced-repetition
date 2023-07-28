@@ -27,6 +27,10 @@ export class RevLog {
     constructor() {
         return;
     }
+
+    static getKeyNames() {
+        return ["id", "cid", "r", "time", "type", "tag"];
+    }
 }
 
 interface FsrsSettings {
@@ -52,13 +56,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     filename = "ob_revlog.csv";
     logfilepath: string = null;
     REVLOG_sep = ", ";
-    REVLOG_TITLE = () => {
-        let title = "";
-        Object.keys(RevLog).forEach((key) => {
-            title += key.toString() + this.REVLOG_sep;
-        });
-        return title + "\n";
-    };
+    REVLOG_TITLE = RevLog.getKeyNames().join(this.REVLOG_sep) + "\n";
 
     constructor() {
         super();
@@ -193,11 +191,9 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const carddata = item.data as FsrsData;
         rlog.time = 0;
         rlog.type = carddata.state;
+        rlog.tag = item.deckName;
 
-        let data = "";
-        Object.values(rlog).forEach((value) => {
-            data += value.toString() + this.REVLOG_sep;
-        });
+        let data = Object.values(rlog).join(this.REVLOG_sep);
         data += "\n";
 
         if (!(await adapter.exists(this.logfilepath))) {
@@ -248,7 +244,8 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                 text.setValue(this.settings.revlog_tags.join(" ")).onChange((value) => {
                     applySettingsUpdate(async () => {
                         this.settings.revlog_tags = value.split(/\s+/);
-                        await this.plugin.savePluginData();
+                        update(this.settings);
+                        // await this.plugin.savePluginData();
                     });
                 })
             );
@@ -264,7 +261,8 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .onChange(async (value) => {
                         this.settings.request_retention = this.fsrs.p.request_retention =
                             value / 100;
-                        await this.plugin.savePluginData();
+                        update(this.settings);
+                        // await this.plugin.savePluginData();
                     })
             )
             .addExtraButton((button) => {
@@ -316,10 +314,12 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             .setName("w")
             .setDesc("w")
             .addText((text) =>
-                text.setValue(JSON.stringify(this.settings.w)).onChange((value) => {
+                text.setValue(this.settings.w.join(", ")).onChange((value) => {
                     applySettingsUpdate(async () => {
                         try {
-                            const numValue: number[] = Object.assign({}, JSON.parse(value));
+                            const numValue: number[] = value.split(/[ ,]+/).map((v) => {
+                                return Number.parseFloat(v);
+                            });
                             if (numValue.length === this.settings.w.length) {
                                 this.settings.w = this.fsrs.p.w = numValue;
                                 update(this.settings);
