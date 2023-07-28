@@ -1204,7 +1204,7 @@ export default class SRPlugin extends Plugin {
                 }
                 this.store.syncTrackfileCardSched(
                     note,
-                    deckPath[0],
+                    "#" + deckPath[0],
                     lineNo,
                     cardTextHash,
                     siblingMatches.length,
