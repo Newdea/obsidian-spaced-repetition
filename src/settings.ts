@@ -715,7 +715,9 @@ export class SRSettingTab extends PluginSettingTab {
                                 plugin.algorithm = algorithms[plugin.data.settings.algorithm];
                                 plugin.algorithm.updateSettings(
                                     plugin,
-                                    plugin.data.settings.algorithmSettings
+                                    plugin.data.settings.algorithmSettings[
+                                        plugin.data.settings.algorithm
+                                    ]
                                 );
                                 plugin.savePluginData();
                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -746,7 +748,7 @@ export class SRSettingTab extends PluginSettingTab {
         plugin.algorithm.displaySettings(containerEl, (settings: any) => {
             plugin.data.settings.algorithmSettings[plugin.data.settings.algorithm] = settings;
             plugin.savePluginData();
-            this.display();
+            this.display(); // 容易导致失去输入焦点
         });
     }
 
