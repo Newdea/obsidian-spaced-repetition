@@ -422,7 +422,10 @@ export class DataStore {
         const ind = this.getFileIndex(path);
         let cardLen = 0;
         if (ind >= 0) {
-            cardLen = this.getTrackedFileByIndex(ind).cardItems.length;
+            const file = this.getTrackedFileByIndex(ind);
+            if (Object.keys(file).includes("cardItems")) {
+                cardLen = this.getTrackedFileByIndex(ind).cardItems.length;
+            }
         }
 
         return cardLen > 0;
@@ -998,6 +1001,11 @@ export class DataStore {
                 this.data.items[iid] = null;
                 console.debug("removed", iid);
                 removed += 1;
+            } else {
+                const item = this.data.items[iid];
+                if (item.deckName !== deckName) {
+                    item.deckName = deckName;
+                }
             }
         }
         cardinfo.itemIds = newitemIds;
@@ -1721,6 +1729,18 @@ export class DataStore {
         return !shouldIgnore;
     }
 
+    isTagedNoteDeckName(deckName: string) {
+        let isTaged = false;
+        if (
+            this.plugin.data.settings.tagsToReview.some(
+                (tagToReview) => deckName === tagToReview || deckName.startsWith(tagToReview + "/")
+            )
+        ) {
+            isTaged = true;
+        }
+        return isTaged;
+    }
+
     isTagedDeckName(deckName: string) {
         let isTaged = false;
         if (
@@ -1775,7 +1795,7 @@ export class DataStore {
             carditem = this.trackFileCard(note, lineNo, cardTextHash);
         }
 
-        if (!this.isTagedDeckName(deckName)) {
+        if (!this.isTagedDeckName(deckName) && !this.isTagedNoteDeckName(deckName)) {
             deckName = this.getDefaultDackName();
         }
         this.updateCardItems(note, carditem, count, deckName);

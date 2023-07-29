@@ -176,7 +176,15 @@ export class FsrsAlgorithm extends SrsAlgorithm {
      * @param rating
      */
     async appendRevlog(now: Date, item: RepetitionItem, rating: number) {
-        if (!this.settings.revlog_tags.includes(item.deckName)) {
+        if (item.deckName.includes("/")) {
+            if (
+                !this.settings.revlog_tags.some(
+                    (tag: string) => item.deckName === tag || item.deckName.startsWith(tag + "/")
+                )
+            ) {
+                return;
+            }
+        } else if (!this.settings.revlog_tags.includes(item.deckName)) {
             return;
         }
         const plugin = this.plugin;
