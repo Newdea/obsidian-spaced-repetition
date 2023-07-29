@@ -317,7 +317,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
         new Setting(containerEl)
             .setName("w")
-            .setDesc("w")
+            // .setDesc("")
             .addText((text) =>
                 text.setValue(this.settings.w.join(", ")).onChange((value) => {
                     applySettingsUpdate(async () => {
@@ -346,7 +346,10 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         this.settings.w = this.fsrs.p.w = this.defaultSettings().w;
                         update(this.settings);
                     });
-            });
+            })
+            .settingEl.querySelector(".setting-item-description").innerHTML =
+            '查阅 <a href= "https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm"> FSRS V4 WIKI </a> 以对各参数进行设置.';
+
         return;
     }
 }
