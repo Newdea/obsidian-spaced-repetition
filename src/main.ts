@@ -1023,11 +1023,11 @@ export default class SRPlugin extends Plugin {
                 this.data.settings.trackedNoteToDecks &&
                 (this.store.isTaged(note, "note") || this.store.isTrackedCardfile(note.path))
             ) {
-                deckPath = note.path.split("/");
-                deckPath.pop(); // remove filename
-                if (deckPath.length === 0) {
-                    deckPath = ["/"];
+                const deckName = this.store.getNoteDeckName(tags);
+                if (!this.store.isTracked(note.path)) {
+                    this.store.trackFile(note.path, deckName);
                 }
+                deckPath = deckName.substring(1).split("/");
             }
         }
 

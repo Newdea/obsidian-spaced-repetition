@@ -1690,15 +1690,8 @@ export class DataStore {
         }
 
         if (tagtype === "note") {
-            for (const tag of tags) {
-                if (
-                    this.plugin.data.settings.tagsToReview.some(
-                        (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
-                    )
-                ) {
-                    shouldIgnore = false;
-                    break;
-                }
+            if (this.getNoteDeckName(tags) !== null) {
+                shouldIgnore = false;
             }
         } else if (tagtype === "card") {
             for (const tag of tags) {
@@ -1708,26 +1701,18 @@ export class DataStore {
                 }
             }
         } else if (tagtype === "all") {
+            if (this.getNoteDeckName(tags) !== null) {
+                shouldIgnore = false;
+            }
             for (const tag of tags) {
-                if (
-                    this.plugin.data.settings.tagsToReview.some(
-                        (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
-                    ) ||
-                    this.plugin.data.settings.flashcardTags.some(
-                        (flashcardTag) => tag === flashcardTag || tag.startsWith(flashcardTag + "/")
-                    )
-                ) {
+                if (this.isTagedDeckName(tag)) {
                     shouldIgnore = false;
                     break;
                 }
             }
         }
 
-        if (shouldIgnore) {
-            return false;
-        }
-
-        return true;
+        return !shouldIgnore;
     }
 
     isTagedDeckName(deckName: string) {
@@ -1741,6 +1726,21 @@ export class DataStore {
             isTaged = true;
         }
         return isTaged;
+    }
+
+    getNoteDeckName(tags: string[]) {
+        let deckName = null;
+        for (const tag of tags) {
+            if (
+                this.plugin.data.settings.tagsToReview.some(
+                    (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
+                )
+            ) {
+                deckName = tag;
+                break;
+            }
+        }
+        return deckName;
     }
 
     /**
