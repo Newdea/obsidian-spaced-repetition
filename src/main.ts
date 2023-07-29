@@ -1026,11 +1026,13 @@ export default class SRPlugin extends Plugin {
                 let deckName = this.store.getNoteDeckName(tags);
                 if (deckName == null) {
                     deckName = this.store.getDefaultDackName();
+                    deckPath = deckName.split("/");
+                } else {
+                    deckPath = deckName.substring(1).split("/");
                 }
                 if (!this.store.isTracked(note.path)) {
                     this.store.trackFile(note.path, deckName);
                 }
-                deckPath = deckName.substring(1).split("/");
             }
         }
 
