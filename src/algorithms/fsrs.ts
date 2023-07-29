@@ -17,6 +17,7 @@ function applySettingsUpdate(callback: () => void): void {
 export type FsrsData = fsrsjs.Card;
 
 export class RevLog {
+    // https://github.com/open-spaced-repetition/fsrs-optimizer
     card_id = -1;
     review_time = 0;
     review_rating = 0;
@@ -28,20 +29,11 @@ export class RevLog {
         return;
     }
 
+    // https://qastack.cn/programming/43909566/get-keys-of-a-typescript-interface-as-array-of-strings
     static getKeyNames() {
-        return ["id", "cid", "r", "time", "type", "tag"];
+        return Object.keys(new RevLog());
     }
 }
-// https://qastack.cn/programming/43909566/get-keys-of-a-typescript-interface-as-array-of-strings
-// This is the pure interface version, to be used/exported
-// interface IRevLog extends RevLog {}
-// // Props type as an array, to be exported
-// type RevLogArray = Array<keyof IRevLog>;
-// // Props array itself!
-// const propsArray: RevLogArray = Object.keys(new RevLog()) as RevLogArray;
-
-// console.log(propsArray); // prints out  ["id", "title", "isDeleted"]
-console.log(Object.keys(new RevLog())); // prints out  ["id", "title", "isDeleted"]
 
 interface FsrsSettings {
     revlog_tags: string[];
@@ -67,6 +59,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     logfilepath: string = null;
     REVLOG_sep = ",";
     REVLOG_TITLE = RevLog.getKeyNames().join(this.REVLOG_sep) + "\n";
+    review_duration = 0;
 
     constructor() {
         super();
@@ -127,6 +120,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             intvls.push(nextInterval / DateUtils.DAYS_TO_MILLIS);
             // console.debug("due:" + due + ", last: " + lastrv + ", intvl: " + nextInterval);
         });
+        this.review_duration = new Date().getTime();
         return intvls;
     }
     onSelection(item: RepetitionItem, optionStr: string, repeat: boolean): ReviewResult {
@@ -171,7 +165,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
         const nextInterval = item.data.due.valueOf() - item.data.last_review.valueOf();
 
-        const logkeys = Object.prototype.toString();
         this.appendRevlog(now, item, response);
 
         return {
@@ -201,12 +194,14 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         const plugin = this.plugin;
         const adapter = plugin.app.vault.adapter;
         const rlog = new RevLog();
-        rlog.id = now.getTime();
-        rlog.cid = item.ID;
-        rlog.r = rating;
+        rlog.card_id = item.ID;
+        rlog.review_time = now.getTime();
+        rlog.review_rating = rating;
         const carddata = item.data as FsrsData;
-        rlog.time = 0;
-        rlog.type = carddata.state;
+        rlog.review_duration =
+            this.review_duration > 0 ? new Date().getTime() - this.review_duration : 0;
+        this.review_duration = 0;
+        rlog.review_state = carddata.state;
         rlog.tag = item.deckName;
 
         let data = Object.values(rlog).join(this.REVLOG_sep);
