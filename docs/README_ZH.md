@@ -5,7 +5,7 @@
 
 ## Features
 
--   [@st3v3nmw's ReadMe](https://github.com/Newdea/obsidian-spaced-repetition#readme)
+-   [@st3v3nmw's ReadMe](https://github.com/st3v3nmw/obsidian-spaced-repetition#readme)
 -   [english ReadMe](../README.md)
 
 1. 复习时间信息可以保存在单独文件内，不修改原笔记文件内容；
@@ -13,7 +13,7 @@
 3. 可以只转换复习笔记到卡片组，而不是全部库的笔记都转换;
 4. 在有多个标签时，可不用选标签，直接打开笔记；
 5. 算法可以切换：默认的 Anki 优化算法、Anki 算法、[Fsrs 算法](https://github.com/open-spaced-repetition/fsrs.js)；
-6. 使用 Fsrs 算法时，可输出重复日志文件 `ob_revlog.csv`，以使用[optimizer](https://github.com/open-spaced-repetition/fsrs4remnote/blob/main/optimizer.ipynb) 优化算法参数，达到更好的复习效果；
+6. 使用 Fsrs 算法时，可根据标签输出重复日志文件 `ob_revlog.csv`，以使用[optimizer](https://github.com/open-spaced-repetition/fsrs4remnote/blob/main/optimizer.ipynb) 优化算法参数，达到更好的复习效果；
 7. 其他待发现的小改动；
 
 **注意**

@@ -6,7 +6,7 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 
 ## Features
 
--   [@st3v3nmw's ReadMe](https://github.com/Newdea/obsidian-spaced-repetition#readme)
+-   [@st3v3nmw's ReadMe](https://github.com/st3v3nmw/obsidian-spaced-repetition#readme)
 -   [中文使用手册](./docs/README_ZH.md)
 
 -   merge [recall plugin](https://github.com/martin-jw/obsidian-recall) to use seperate file
