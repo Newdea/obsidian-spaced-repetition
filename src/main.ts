@@ -1461,7 +1461,8 @@ export default class SRPlugin extends Plugin {
         let isDue = false;
         const queue = this.store.data.toDayAllQueue;
         const queueLatter = this.store.data.toDayLatterQueue;
-        const len = Object.keys(queue).length;
+        const idQueue = Object.keys(queue);
+        const len = idQueue.length;
         this.dueNotesCount_real = len;
 
         if (len === 0) {
@@ -1481,18 +1482,25 @@ export default class SRPlugin extends Plugin {
                 }
             }
         } else {
-            const indArr = Array.from(new Array(NotesCount).keys());
+            const deckIdqueue: number[] = [];
+            Object.values(queue).forEach((v, ind) => {
+                if (v === deck.deckName) {
+                    deckIdqueue.push(Number.parseInt(idQueue[ind]));
+                }
+            });
+            const indArr = Array.from(new Array(deckIdqueue.length).keys());
+
             do {
-                index = indArr[Math.round(Math.random() * (indArr.length - 1))];
-                const note = deck.scheduledNotes[index].note;
-                const fileid = this.store.getFileId(note.path);
-                if (
-                    Object.prototype.hasOwnProperty.call(queue, fileid) ||
-                    !Object.prototype.hasOwnProperty.call(queueLatter, fileid)
-                ) {
+                const qindex = indArr[Math.round(Math.random() * (indArr.length - 1))];
+                const item = this.store.getItembyID(deckIdqueue[qindex]);
+                const path = this.store.getFilePath(item);
+                index = deck.scheduledNotes.findIndex((v, ind) => {
+                    if (v.note.path === path) return true;
+                });
+                if (index >= 0) {
                     isDue = true;
                 }
-                indArr.splice(indArr.indexOf(index), 1);
+                indArr.splice(indArr.indexOf(qindex), 1);
             } while (!isDue && indArr.length > 0);
         }
         if (!isDue) {
