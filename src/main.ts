@@ -1500,7 +1500,7 @@ export default class SRPlugin extends Plugin {
                         if (
                             (this.data.settings.trackedNoteToDecks &&
                                 this.store.isTaged(file, "all")) ||
-                            (this.data.settings.trackedNoteToDecks &&
+                            (!this.data.settings.trackedNoteToDecks &&
                                 this.store.isTaged(file, "card"))
                         ) {
                             await this.store.syncNoteCardsIndex(file);

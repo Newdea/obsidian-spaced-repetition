@@ -419,7 +419,13 @@ export class DataStore {
      * @returns {boolean}
      */
     isTrackedCardfile(path: string): boolean {
-        return this.getFileIndex(path) >= 0;
+        const ind = this.getFileIndex(path);
+        let cardLen = 0;
+        if (ind >= 0) {
+            cardLen = this.getTrackedFileByIndex(ind).cardItems.length;
+        }
+
+        return cardLen > 0;
     }
 
     /**
