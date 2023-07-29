@@ -225,6 +225,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.baseEase = DEFAULT_SETTINGS.baseEase;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -248,6 +249,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.lapsesIntervalChange = DEFAULT_SETTINGS.lapsesIntervalChange;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -280,6 +282,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.easyBonus = DEFAULT_SETTINGS.easyBonus;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -312,6 +315,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.maximumInterval = DEFAULT_SETTINGS.maximumInterval;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -335,6 +339,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.maxLinkFactor = DEFAULT_SETTINGS.maxLinkFactor;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
         return;

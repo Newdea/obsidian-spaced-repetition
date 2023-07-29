@@ -91,6 +91,7 @@ export default class SRPlugin extends Plugin {
     public commands: Commands;
     public algorithm: SrsAlgorithm;
     public reviewNoteFloatBar: reviewNoteResponseModal;
+    public settingTab: SRSettingTab;
 
     async onload(): Promise<void> {
         await this.loadPluginData();
@@ -321,7 +322,8 @@ export default class SRPlugin extends Plugin {
             },
         });
 
-        this.addSettingTab(new SRSettingTab(this.app, this));
+        this.settingTab = new SRSettingTab(this.app, this);
+        this.addSettingTab(this.settingTab);
 
         this.app.workspace.onLayoutReady(() => {
             this.initView();

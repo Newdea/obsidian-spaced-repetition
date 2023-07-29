@@ -748,7 +748,7 @@ export class SRSettingTab extends PluginSettingTab {
         plugin.algorithm.displaySettings(containerEl, (settings: any) => {
             plugin.data.settings.algorithmSettings[plugin.data.settings.algorithm] = settings;
             plugin.savePluginData();
-            this.display(); // 容易导致失去输入焦点
+            // this.display(); // 容易导致失去输入焦点
         });
     }
 

@@ -239,6 +239,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             this.updateFsrsParams();
             this.initFlag = true;
         }
+
         containerEl.createDiv().innerHTML =
             '用于间隔重复的算法. 更多信息请查阅 <a href="https://github.com/open-spaced-repetition/fsrs.js">FSRS算法</a>.';
 
@@ -267,7 +268,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         this.settings.request_retention = this.fsrs.p.request_retention =
                             value / 100;
                         update(this.settings);
-                        // await this.plugin.savePluginData();
                     })
             )
             .addExtraButton((button) => {
@@ -278,6 +278,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         this.settings.request_retention = this.defaultSettings().request_retention;
                         this.fsrs.p.request_retention = this.settings.request_retention;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -297,6 +298,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
                             this.settings.maximum_interval = this.fsrs.p.maximum_interval =
                                 numValue;
+                            text.setValue(this.settings.maximum_interval.toString());
                             update(this.settings);
                         } else {
                             new Notice(t("VALID_NUMBER_WARNING"));
@@ -312,6 +314,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                         this.settings.maximum_interval = this.fsrs.p.maximum_interval =
                             this.defaultSettings().maximum_interval;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             });
 
@@ -345,6 +348,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .onClick(async () => {
                         this.settings.w = this.fsrs.p.w = this.defaultSettings().w;
                         update(this.settings);
+                        this.plugin.settingTab.display();
                     });
             })
             .settingEl.querySelector(".setting-item-description").innerHTML =
