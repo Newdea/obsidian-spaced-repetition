@@ -1409,9 +1409,23 @@ export default class SRPlugin extends Plugin {
         let rdname = this.lastSelectedReviewDeck;
         let ndeck: ReviewDeck;
         let ncount = 0;
+        const queue = this.store.data.toDayAllQueue;
 
         if (this.lastSelectedReviewDeck != null && Object.keys(this.reviewDecks).includes(rdname)) {
             ndeck = this.reviewDecks[rdname];
+            let deckQueueCount = 0;
+            Object.values(queue).forEach((value) => {
+                if (value === rdname) {
+                    deckQueueCount++;
+                }
+            });
+            deckQueueCount -= ndeck.newNotes.length;
+            ndeck.dueNotesCount =
+                deckQueueCount > ndeck.dueNotesCount
+                    ? deckQueueCount > ndeck.scheduledNotes.length
+                        ? ndeck.scheduledNotes.length
+                        : deckQueueCount
+                    : ndeck.dueNotesCount;
             ncount = ndeck.dueNotesCount + ndeck.newNotes.length;
             if (ncount > 0) {
                 return this.lastSelectedReviewDeck;
@@ -1421,6 +1435,19 @@ export default class SRPlugin extends Plugin {
         do {
             rdname = reviewDeckNames[Math.round(Math.random() * (reviewDeckNames.length - 1))];
             ndeck = this.reviewDecks[rdname];
+            let deckQueueCount = 0;
+            Object.values(queue).forEach((value) => {
+                if (value === rdname) {
+                    deckQueueCount++;
+                }
+            });
+            deckQueueCount -= ndeck.newNotes.length;
+            ndeck.dueNotesCount =
+                deckQueueCount > ndeck.dueNotesCount
+                    ? deckQueueCount > ndeck.scheduledNotes.length
+                        ? ndeck.scheduledNotes.length
+                        : deckQueueCount
+                    : ndeck.dueNotesCount;
             ncount = ndeck.dueNotesCount + ndeck.newNotes.length;
 
             ind = reviewDeckNames.lastIndexOf(rdname);
