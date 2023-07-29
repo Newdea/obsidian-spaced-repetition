@@ -17,12 +17,12 @@ function applySettingsUpdate(callback: () => void): void {
 export type FsrsData = fsrsjs.Card;
 
 export class RevLog {
-    id: number;
-    cid: number;
-    r: number;
-    time: number;
-    type: number;
-    tag: string;
+    card_id = -1;
+    review_time = 0;
+    review_rating = 0;
+    review_state = 0;
+    review_duration = 0;
+    tag = "";
 
     constructor() {
         return;
@@ -32,6 +32,16 @@ export class RevLog {
         return ["id", "cid", "r", "time", "type", "tag"];
     }
 }
+// https://qastack.cn/programming/43909566/get-keys-of-a-typescript-interface-as-array-of-strings
+// This is the pure interface version, to be used/exported
+// interface IRevLog extends RevLog {}
+// // Props type as an array, to be exported
+// type RevLogArray = Array<keyof IRevLog>;
+// // Props array itself!
+// const propsArray: RevLogArray = Object.keys(new RevLog()) as RevLogArray;
+
+// console.log(propsArray); // prints out  ["id", "title", "isDeleted"]
+console.log(Object.keys(new RevLog())); // prints out  ["id", "title", "isDeleted"]
 
 interface FsrsSettings {
     revlog_tags: string[];
@@ -161,6 +171,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
         const nextInterval = item.data.due.valueOf() - item.data.last_review.valueOf();
 
+        const logkeys = Object.prototype.toString();
         this.appendRevlog(now, item, response);
 
         return {
