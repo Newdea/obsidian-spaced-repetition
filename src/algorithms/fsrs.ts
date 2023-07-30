@@ -164,21 +164,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         // review_log = scheduling_cards[2].review_log;
 
         const nextInterval = item.data.due.valueOf() - item.data.last_review.valueOf();
-        if (repeat) {
-            if (response == 1) {
-                correct = false;
-            }
-
-            return {
-                correct,
-                nextReview: -1,
-            };
-        }
-
-        if (response == 1) {
-            // Again
-            correct = false;
-        }
 
         this.appendRevlog(now, item, response);
 
