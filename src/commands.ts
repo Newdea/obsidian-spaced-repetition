@@ -149,10 +149,7 @@ export default class Commands {
             id: "debug-clear-queue",
             name: "Clear Queue",
             callback: () => {
-                plugin.store.data.queue = [];
-                plugin.store.data.repeatQueue = [];
-                plugin.store.data.cardQueue = [];
-                plugin.store.data.cardRepeatQueue = [];
+                plugin.store.clearQueue();
             },
         });
 

@@ -162,7 +162,8 @@ export default {
     REQUEST_RETENTION_DESC:
         "The probability (percentage) that you expect to recall the answer the next time you review",
     REVLOG_TAGS: "Tags for output review log",
-    REVLOG_TAGS_DESC: "Tags for output review log, could be flashcards tags or/and notes tags",
+    REVLOG_TAGS_DESC:
+        "Tags for output review log, could be flashcards tags or/and notes tags(e.g. #review #flashcards #tag1), default empty means it output to the review log file normally without filtered by tags",
 
     FLASHCARD_AGAIN_LABEL: "Again Button Text",
     FLASHCARD_BLACKOUT_LABEL: "Blackout Button Text",

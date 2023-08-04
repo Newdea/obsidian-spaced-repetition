@@ -69,7 +69,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     defaultSettings(): FsrsSettings {
         return {
-            revlog_tags: ["#review"],
+            revlog_tags: [],
             request_retention: 0.9,
             maximum_interval: 36500,
             w: [
@@ -180,17 +180,21 @@ export class FsrsAlgorithm extends SrsAlgorithm {
      * @param rating
      */
     async appendRevlog(now: Date, item: RepetitionItem, rating: number) {
-        if (item.deckName.includes("/")) {
-            if (
-                !this.settings.revlog_tags.some(
-                    (tag: string) => item.deckName === tag || item.deckName.startsWith(tag + "/")
-                )
-            ) {
+        if (this.settings.revlog_tags.length > 0) {
+            if (item.deckName.includes("/")) {
+                if (
+                    !this.settings.revlog_tags.some(
+                        (tag: string) =>
+                            item.deckName === tag || item.deckName.startsWith(tag + "/")
+                    )
+                ) {
+                    return;
+                }
+            } else if (!this.settings.revlog_tags.includes(item.deckName)) {
                 return;
             }
-        } else if (!this.settings.revlog_tags.includes(item.deckName)) {
-            return;
         }
+
         const plugin = this.plugin;
         const adapter = plugin.app.vault.adapter;
         const rlog = new RevLog();
@@ -255,7 +259,9 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             .addTextArea((text) =>
                 text.setValue(this.settings.revlog_tags.join(" ")).onChange((value) => {
                     applySettingsUpdate(async () => {
-                        this.settings.revlog_tags = value.split(/\s+/);
+                        const tags = value.split(/[\n\s]+/);
+                        tags.last() === "" ? tags.pop() : tags;
+                        this.settings.revlog_tags = tags;
                         update(this.settings);
                         // await this.plugin.savePluginData();
                     });

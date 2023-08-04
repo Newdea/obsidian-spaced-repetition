@@ -148,7 +148,8 @@ export default {
     REQUEST_RETENTION: "保留度",
     REQUEST_RETENTION_DESC: "在下次进行复习时，你期望能回想起答案的概率（百分比）",
     REVLOG_TAGS: "输出到日志的标签",
-    REVLOG_TAGS_DESC: "用于输出到日志的标签, 卡片或笔记的标签都行",
+    REVLOG_TAGS_DESC:
+        "用于输出到日志的标签, 卡片或笔记的标签（如#review #flashcards #tag1）都行。默认留空则不按标签区分，都正常输出到日志表格",
 
     FLASHCARD_AGAIN_LABEL: "重来 按钮文本",
     FLASHCARD_BLACKOUT_LABEL: "忘记 按钮文本",

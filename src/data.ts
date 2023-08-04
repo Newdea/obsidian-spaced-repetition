@@ -9,6 +9,7 @@ import { CardType, ReviewResponse } from "./scheduling";
 import { parse } from "./parser";
 import { cyrb53 } from "./utils";
 import deepcopy from "deepcopy";
+import { isArray } from "chart.js/dist/helpers/helpers.core";
 
 const ROOT_DATA_PATH = "./tracked_files.json";
 const PLUGIN_DATA_PATH = "./.obsidian/plugins/obsidian-spaced-repetition-recall/tracked_files.json";
@@ -926,6 +927,7 @@ export class DataStore {
                     this.data.repeatQueue.remove(itemInd);
                 }
                 this.data.items[itemInd] = null;
+                console.debug("null item:" + itemInd);
                 removed += 1;
             }
         }
@@ -946,8 +948,11 @@ export class DataStore {
         notice?: boolean
     ): { added: number; removed: number } | null {
         if (notice == null) notice = false;
-        let len = cardinfo.itemIds.length;
+        const len = cardinfo.itemIds.length;
         if (len === count) {
+            for (const id of cardinfo.itemIds) {
+                this.updateItemDeckName(id, deckName);
+            }
             return;
         }
 
@@ -970,10 +975,9 @@ export class DataStore {
             });
             console.debug("delete %d ids:", removed, newitemIds.slice(count));
             newitemIds.splice(count, len - count);
-            len = newitemIds.length;
-        }
-
-        if (count - len > 0) {
+            // len = newitemIds.length;
+        } else {
+            // if (count > len)
             // add new card data
             for (let i = 0; i < count - len; i++) {
                 const newItem: RepetitionItem = Object.assign({}, NEW_ITEM);
@@ -1002,10 +1006,7 @@ export class DataStore {
                 console.debug("removed", iid);
                 removed += 1;
             } else {
-                const item = this.data.items[iid];
-                if (item.deckName !== deckName) {
-                    item.deckName = deckName;
-                }
+                this.updateItemDeckName(iid, deckName);
             }
         }
         cardinfo.itemIds = newitemIds;
@@ -1034,6 +1035,13 @@ export class DataStore {
             );
         }
         return { added, removed };
+    }
+
+    updateItemDeckName(id: number, deckName: string) {
+        const item = this.data.items[id];
+        if (item.deckName !== deckName) {
+            item.deckName = deckName;
+        }
     }
 
     /**
@@ -1085,6 +1093,13 @@ export class DataStore {
         console.log("Updated tracking: " + old + " -> " + newPath);
     }
 
+    findMovedFile(path: string): TFile | null {
+        const pathArr = path.split("/");
+        const name = pathArr[pathArr.length - 1];
+        const newTfile = this.plugin.app.metadataCache.getFirstLinkpathDest(name, "");
+        return newTfile;
+    }
+
     /**
      * buildQueue. indexlist of items
      */
@@ -1117,7 +1132,7 @@ export class DataStore {
                                 console.debug("untrackfile by buildqueue:", file);
                                 new Notice("untrackfile by buildqueue:" + file);
                                 removedItems += this.untrackFile(file.path, false);
-                                item = null;
+                                // item = null;
                                 untrackedFiles += 1;
                             }
                         } else if (file.items.file !== id) {
@@ -1212,12 +1227,42 @@ export class DataStore {
     async verify(file: TrackedFile): Promise<boolean> {
         const adapter = this.plugin.app.vault.adapter;
         if (file != null) {
-            return adapter.exists(file.path).catch((_reason) => {
+            const result = await adapter.exists(file.path).catch((_reason) => {
                 console.error("Unable to verify file: ", file.path);
-                return false;
+                // return false;
             });
+            if (!result) {
+                // in case file moved away.
+                const newfile = this.findMovedFile(file.path);
+                if (newfile !== null) {
+                    file.path = newfile.path;
+                    console.debug("a file has been moved: " + newfile.path);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
         }
         return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    clearQueue(queue: any = null) {
+        if (queue == null) {
+            this.data.queue = [];
+            this.data.repeatQueue = [];
+            this.data.cardQueue = [];
+            this.data.cardRepeatQueue = [];
+            this.data.toDayAllQueue = {};
+            this.data.toDayLatterQueue = {};
+            console.debug("all queue are cleared!");
+        } else if (isArray(queue)) {
+            queue = [];
+        } else {
+            queue = {};
+        }
     }
 
     /**
@@ -1267,6 +1312,7 @@ export class DataStore {
                         break;
                     } else if (ifind === nullFileList[nli]) {
                         item = null;
+                        console.debug("pruneData: item null: " + ifind);
                         break;
                     }
                 }
@@ -1508,10 +1554,7 @@ export class DataStore {
         }
 
         // update item
-        if (item.deckName !== rdeck.deckName) {
-            item.deckName = rdeck.deckName;
-            this.save();
-        }
+        this.updateItemDeckName(fileid, rdeck.deckName);
         if (!Object.prototype.hasOwnProperty.call(item, "itemType")) {
             item.itemType = this.isCardItem(fileid) ? RPITEMTYPE.CARD : RPITEMTYPE.NOTE;
             this.save();
@@ -1754,19 +1797,17 @@ export class DataStore {
         return isTaged;
     }
 
-    getNoteDeckName(tags: string[]) {
-        let deckName = null;
+    getNoteDeckName(tags: string[]): string | null {
         for (const tag of tags) {
             if (
                 this.plugin.data.settings.tagsToReview.some(
                     (tagToReview) => tag === tagToReview || tag.startsWith(tagToReview + "/")
                 )
             ) {
-                deckName = tag;
-                break;
+                return tag;
             }
         }
-        return deckName;
+        return null;
     }
 
     /**
