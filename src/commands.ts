@@ -217,9 +217,7 @@ export default class Commands {
             id: "reschedule",
             name: "Reschedule",
             callback: () => {
-                reschedule(
-                    plugin.store.items.filter((item) => item.hasDue && item.isTracked),
-                );
+                reschedule(plugin.store.items.filter((item) => item.hasDue && item.isTracked));
             },
         });
 

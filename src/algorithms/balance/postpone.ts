@@ -38,7 +38,9 @@ function postpone(items: RepetitionItem[], newdue?: number): RepetitionItem[] {
     let cnt = 0;
     items.map((item) => {
         let newitvl: number,
-            olastview = item.hasDue ? item.nextReview - item.interval*DateUtils.DAYS_TO_MILLIS : Date.now();
+            olastview = item.hasDue
+                ? item.nextReview - item.interval * DateUtils.DAYS_TO_MILLIS
+                : Date.now();
 
         // reschedule, request Retention=0.9
         // let interval = item.interval * 9 * (1 / 0.9 - 1);

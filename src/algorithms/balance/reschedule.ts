@@ -10,7 +10,7 @@ export function reschedule(items: RepetitionItem[]): RepetitionItem[] {
         const result = reschedule_fsrs(items);
         reCnt = result.reCnt;
     } else {
-        reCnt=reschedule_default(items).reCnt;
+        reCnt = reschedule_default(items).reCnt;
     }
     console.groupEnd();
     debug("reschedule", 0, { items, reCnt });
