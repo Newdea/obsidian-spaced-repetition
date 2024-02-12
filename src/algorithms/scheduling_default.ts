@@ -66,7 +66,7 @@ export function schedule(
 
     // replaces random fuzz with load balancing over the fuzz interval
 
-    interval = balance(interval, dueDates, settingsObj.maximumInterval);
+    // interval = balance(interval, dueDates, settingsObj.maximumInterval);
 
     return { interval: Math.round(interval * 10) / 10, ease };
 }
@@ -102,12 +102,12 @@ export class DefaultAlgorithm extends SrsAlgorithm {
         const now: number = Date.now();
         const delayBeforeReview = due === 0 ? 0 : now - due; //just in case.
         // console.log("item.data:", item.data);
-        const dueDatesNotesorCards = this.getDueDates(item.itemType);
+        // const dueDatesNotesorCards = this.getDueDates(item.itemType);
 
         const intvls: number[] = [];
         this.srsOptions().forEach((opt, ind) => {
             const dataCopy = deepcopy(data);
-            const dueDates = deepcopy(dueDatesNotesorCards);
+            // const dueDates = deepcopy(dueDatesNotesorCards);
 
             const schedObj: Record<string, number> = schedule(
                 ind,
@@ -115,7 +115,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
                 dataCopy.ease,
                 delayBeforeReview,
                 this.settings,
-                dueDates,
+                // dueDates,
             );
             const nextInterval = schedObj.interval;
             intvls.push(nextInterval);
@@ -148,7 +148,7 @@ export class DefaultAlgorithm extends SrsAlgorithm {
             data.ease,
             delayBeforeReview,
             this.settings,
-            this.getDueDates(item.itemType),
+            // this.getDueDates(item.itemType),
         );
 
         const nextReview = schedObj.interval;

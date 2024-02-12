@@ -1,4 +1,5 @@
 import { SrsAlgorithm, algorithmNames } from "src/algorithms/algorithms";
+import { setDueDates } from "src/algorithms/balance/balance";
 import { DefaultAlgorithm } from "src/algorithms/scheduling_default";
 import { DataStore } from "src/dataStore/data";
 import { DataLocation } from "src/dataStore/dataLocation";
@@ -51,7 +52,7 @@ export class SampleDataStore {
                     noteStats.updateStats(item);
                 }
             });
-        algo.setDueDates(noteStats.delayedDays.dict, cardStats.delayedDays.dict);
+        setDueDates(noteStats.delayedDays.dict, cardStats.delayedDays.dict);
         const size = store.itemSize;
         arr.map((_v) => {
             store.reviewId(

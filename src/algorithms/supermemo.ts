@@ -86,7 +86,6 @@ export class Sm2Algorithm extends SrsAlgorithm {
             }
 
             data.ease = MiscUtils.fixed(data.ease, 3);
-            nextReview = balance(nextReview, this.getDueDates(item.itemType));
             data.lastInterval = nextReview;
             // console.log("item.data:", item.data);
             // console.log("smdata:", data);

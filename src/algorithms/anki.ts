@@ -114,7 +114,7 @@ export class AnkiAlgorithm extends SrsAlgorithm {
 
         data.ease = MiscUtils.fixed(data.ease, 3);
         data.iteration += 1;
-        nextInterval = balance(nextInterval, this.getDueDates(item.itemType));
+        // nextInterval = balance(nextInterval, item.itemType);
         data.lastInterval = nextInterval;
 
         return {

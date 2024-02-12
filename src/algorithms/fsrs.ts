@@ -8,7 +8,6 @@ import { t } from "src/lang/helpers";
 import deepcopy from "deepcopy";
 import { AnkiData } from "./anki";
 import { Rating, ReviewLog } from "fsrs.js";
-import { balance } from "./balance/balance";
 import { RepetitionItem, ReviewResult } from "src/dataStore/repetitionItem";
 
 // https://github.com/mgmeyers/obsidian-kanban/blob/main/src/Settings.ts
@@ -120,8 +119,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
 
     calcAllOptsIntervals(item: RepetitionItem) {
         const data = item.data as FsrsData;
-        data.due = new Date(data.due);
-        data.last_review = new Date(data.last_review);
         const card = deepcopy(data);
         const now = new Date();
         const scheduling_cards = this.fsrs.repeat(card, now);
@@ -143,8 +140,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         log: boolean = true,
     ): ReviewResult {
         let data = item.data as FsrsData;
-        data.due = new Date(data.due);
-        data.last_review = new Date(data.last_review);
         const response = FsrsOptions.indexOf(optionStr) + 1;
 
         let correct = true;
@@ -169,12 +164,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         data.difficulty = MiscUtils.fixed(data.difficulty, 5);
         data.elapsed_days = MiscUtils.fixed(data.elapsed_days, 3);
 
-        //Get the due date for card:
-        // const due = card.due;
-
-        //Get the state for card:
-        // state = card.state;
-
         // Get the review log after rating :
         if (log) {
             const review_log = scheduling_cards[response].review_log;
@@ -182,11 +171,6 @@ export class FsrsAlgorithm extends SrsAlgorithm {
         }
 
         let nextInterval = data.due.valueOf() - data.last_review.valueOf();
-        // not sure should use balance or not.
-        let days = nextInterval / DateUtils.DAYS_TO_MILLIS;
-        days = balance(days, this.getDueDates(item.itemType), this.settings.maximum_interval);
-        nextInterval = days * DateUtils.DAYS_TO_MILLIS;
-        data.due = new Date(nextInterval + now.getTime());
 
         return {
             correct,

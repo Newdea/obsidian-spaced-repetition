@@ -1,4 +1,5 @@
 import { AnkiData } from "src/algorithms/anki";
+import { balance } from "src/algorithms/balance/balance";
 import { FsrsData } from "src/algorithms/fsrs";
 import { DateUtils } from "src/util/utils_recall";
 
@@ -66,6 +67,11 @@ export class RepetitionItem {
     static create(item: RepetitionItem) {
         const newItem = new RepetitionItem();
         Object.assign(newItem, item);
+        if (newItem.isFsrs) {
+            let data = item.data as FsrsData;
+            data.due = new Date(data.due);
+            data.last_review = new Date(data.last_review);
+        }
         return newItem;
     }
 
@@ -93,6 +99,7 @@ export class RepetitionItem {
      */
     reviewUpdate(result: ReviewResult) {
         this.nextReview = DateUtils.fromNow(result.nextReview).getTime();
+        this.updateDueInterval(this.interval);
         this.timesReviewed += 1;
         if (result.correct) {
             this.timesCorrect += 1;
@@ -130,7 +137,7 @@ export class RepetitionItem {
         return sched;
     }
 
-    private isFsrs(): boolean {
+    get isFsrs(): boolean {
         return Object.prototype.hasOwnProperty.call(this.data, "state");
     }
 
@@ -140,6 +147,7 @@ export class RepetitionItem {
 
         const due = window.moment(this.nextReview);
         sched[1] = due.format("YYYY-MM-DD");
+        sched[2] = parseFloat(sched[2]).toFixed(0);
         return sched;
     }
 
@@ -167,10 +175,51 @@ export class RepetitionItem {
     }
 
     get interval(): number {
-        return Number(this.getSched()[2]);
+        const sched = this.getSched();
+        return sched ? Number(sched[2]) : 0;
     }
+
+    updateDueInterval(newitvl: number, newdue?: number) {
+        // 240212-interval will be used to calc current retention, shoudn't update.
+        const now = Date.now();
+        const enableBalance = newdue == undefined;
+        let oitvl = this.interval,
+            odue = this.hasDue ? this.nextReview : now;
+
+        if (this.isFsrs) {
+            const data = this.data as FsrsData;
+
+            newdue = newdue
+                ? newdue
+                : // : odue - (data.scheduled_days - newitvl) * DateUtils.DAYS_TO_MILLIS;
+                  data.last_review.getTime() + newitvl * DateUtils.DAYS_TO_MILLIS;
+            // data.scheduled_days = newitvl;
+            data.due = new Date(newdue);
+        } else {
+            newdue = newdue ? newdue : odue - (this.interval - newitvl) * DateUtils.DAYS_TO_MILLIS;
+            // (this.data as AnkiData).lastInterval = newitvl;
+        }
+
+        if (enableBalance) {
+            let days = Math.max(0, newdue - now) / DateUtils.DAYS_TO_MILLIS;
+            days = balance(days, this.itemType);
+            let nextInterval = days * DateUtils.DAYS_TO_MILLIS;
+            newdue = nextInterval + now;
+        }
+
+        console.debug({
+            oitvl,
+            newitvl,
+            odue: new Date(this.nextReview).toISOString(),
+            ndue: new Date(newdue).toISOString(),
+        });
+        this.isFsrs ? ((this.data as FsrsData).due = new Date(newdue)) : null;
+        this.nextReview = newdue;
+    }
+
     get ease(): number {
-        return Number(this.getSched()[3]);
+        const sched = this.getSched();
+        return sched ? Number(sched[2]) : 0;
     }
 
     /**

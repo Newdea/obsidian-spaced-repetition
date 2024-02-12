@@ -59,6 +59,7 @@ import { ItemToDecks } from "./dataStore/itemToDecks";
 import { LinkRank } from "src/algorithms/priorities/linkPageranks";
 import { Queue } from "./dataStore/queue";
 import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
+import { setDueDates } from "./algorithms/balance/balance";
 
 interface PluginData {
     settings: SRSettings;
@@ -429,9 +430,6 @@ export default class SRPlugin extends Plugin {
         // Reviewable cards are all except those with the "edit later" tag
         this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
 
-        // Reviewable cards are all except those with the "edit later" tag
-        this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
-
         // sort the deck names
         this.deckTree.sortSubdecksList();
         this.remainingDeckTree = DeckTreeFilter.filterForRemainingCards(
@@ -547,10 +545,7 @@ export default class SRPlugin extends Plugin {
             reviewDeck.sortNotes(this.linkRank.pageranks);
         });
 
-        this.algorithm.setDueDates(
-            this.noteStats.delayedDays.dict,
-            this.cardStats.delayedDays.dict,
-        );
+        setDueDates(this.noteStats.delayedDays.dict, this.cardStats.delayedDays.dict);
 
         this.updateStatusBar();
 

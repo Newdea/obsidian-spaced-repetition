@@ -38,7 +38,7 @@ export async function algorithmSwitchData(
     try {
         const algo = algorithms[toAlgo];
         algo.updateSettings(plugin.data.settings.algorithmSettings[toAlgo]);
-        algo.setDueDates(plugin.noteStats.delayedDays.dict, plugin.cardStats.delayedDays.dict);
+        // algo.setDueDates(plugin.noteStats.delayedDays.dict, plugin.cardStats.delayedDays.dict);
         algo.importer(fromAlgo, items);
         if (toAlgo === algorithmNames.Fsrs) {
             store.data.items.find((item) => {

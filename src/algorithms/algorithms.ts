@@ -11,7 +11,6 @@ export enum algorithmNames {
 export abstract class SrsAlgorithm {
     settings: unknown;
     // plugin: SRPlugin;
-    private dueDates: { [type: string]: Record<number, number> };
     public static instance: SrsAlgorithm;
 
     public static getInstance(): SrsAlgorithm {
@@ -26,14 +25,6 @@ export abstract class SrsAlgorithm {
         this.settings = MiscUtils.assignOnly(this.defaultSettings(), settings);
         // this.plugin = plugin;
         SrsAlgorithm.instance = this;
-    }
-    setDueDates(notedueDates: Record<number, number>, carddueDates: Record<number, number>) {
-        this.dueDates = {};
-        this.dueDates[RPITEMTYPE.NOTE] = notedueDates;
-        this.dueDates[RPITEMTYPE.CARD] = carddueDates;
-    }
-    getDueDates(itemType: string) {
-        return this.dueDates && itemType in this.dueDates ? this.dueDates[itemType] : undefined;
     }
 
     abstract defaultSettings(): unknown;

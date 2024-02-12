@@ -4,6 +4,9 @@ import { ReviewNote } from "src/reviewNote/review-note";
 import { ItemInfoModal } from "src/gui/info";
 import { Queue } from "./dataStore/queue";
 import { debug } from "./util/utils_recall";
+import { postponeItems } from "./algorithms/balance/postpone";
+import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
+import { reschedule } from "./algorithms/balance/reschedule";
 
 export default class Commands {
     plugin: ObsidianSrsPlugin;
@@ -209,5 +212,56 @@ export default class Commands {
                 plugin.store.verifyItems();
             },
         });
+
+        plugin.addCommand({
+            id: "reschedule",
+            name: "Reschedule",
+            callback: () => {
+                reschedule(
+                    plugin.store.items.filter((item) => item.hasDue && item.isTracked),
+                );
+            },
+        });
+
+        plugin.addCommand({
+            id: "postpone-cards",
+            name: "Postpone cards",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => item.isCard && item.isTracked));
+            },
+        });
+        plugin.addCommand({
+            id: "postpone-notes",
+            name: "Postpone notes",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => !item.isCard && item.isTracked));
+            },
+        });
+        plugin.addCommand({
+            id: "postpone-all",
+            name: "Postpone All",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => item.isTracked));
+            },
+        });
+        // plugin.addCommand({
+        //     id: "postpone-manual",
+        //     name: "Postpone after x days(wip)",
+        //     callback: () => {
+        //         return;
+        //         const reviewDeckNames: string[] = Object.keys(plugin.reviewDecks);
+        //         const cardItems = plugin.store.items.filter(
+        //             (item) => item.isCard && item.isTracked,
+        //         );
+        //         const cardDeckNames: string[] = cardItems.map((item) => item.deckName).unique();
+        //         const deckSelectionModal = new ReviewDeckSelectionModal(
+        //             plugin.app,
+        //             reviewDeckNames,
+        //         );
+        //         deckSelectionModal.submitCallback = (deck: string) => plugin.reviewNextNote(deck);
+        //         deckSelectionModal.open();
+        //         postponeItems(plugin.store.items.filter((item) => item.isTracked));
+        //     },
+        // });
     }
 }
