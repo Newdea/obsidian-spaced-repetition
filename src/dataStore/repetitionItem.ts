@@ -219,7 +219,7 @@ export class RepetitionItem {
 
     get ease(): number {
         const sched = this.getSched();
-        return sched ? Number(sched[2]) : 0;
+        return sched ? Number(sched[3]) : 0;
     }
 
     /**
