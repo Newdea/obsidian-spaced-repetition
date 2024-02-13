@@ -25,6 +25,7 @@ import { SrTFile } from "src/SRFile";
 import { RepetitionItem, RPITEMTYPE } from "src/dataStore/repetitionItem";
 import { debug } from "src/util/utils_recall";
 import { ItemInfoModal } from "./info";
+import { setDueDates } from "src/algorithms/balance/balance";
 
 export enum FlashcardModalMode {
     DecksList,
@@ -494,7 +495,7 @@ export class FlashcardModal extends Modal {
 
     private processReviewbyAlgo(response: ReviewResponse) {
         const algo = this.plugin.algorithm;
-        algo.setDueDates(
+        setDueDates(
             this.plugin.noteStats.delayedDays.dict,
             this.plugin.noteStats.delayedDays.dict,
         );
