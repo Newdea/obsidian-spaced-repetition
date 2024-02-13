@@ -99,7 +99,7 @@ export class RepetitionItem {
      */
     reviewUpdate(result: ReviewResult) {
         this.nextReview = DateUtils.fromNow(result.nextReview).getTime();
-        this.updateDueInterval(this.interval);
+        this.updateDueByInterval(this.interval);
         this.timesReviewed += 1;
         if (result.correct) {
             this.timesCorrect += 1;
@@ -179,7 +179,7 @@ export class RepetitionItem {
         return sched ? Number(sched[2]) : 0;
     }
 
-    updateDueInterval(newitvl: number, newdue?: number) {
+    updateDueByInterval(newitvl: number, newdue?: number) {
         // 240212-interval will be used to calc current retention, shoudn't update.
         const now = Date.now();
         const enableBalance = newdue == undefined;

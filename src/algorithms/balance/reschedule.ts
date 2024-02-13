@@ -27,7 +27,7 @@ function reschedule_default(items: RepetitionItem[]) {
         newitvl = Math.min(Math.max(Math.round(interval), 1), 3650);
         if (newitvl !== item.interval) {
             reCnt++;
-            item.updateDueInterval(newitvl);
+            item.updateDueByInterval(newitvl);
         }
     });
 
@@ -46,7 +46,7 @@ function reschedule_fsrs(items: RepetitionItem[]) {
         newitvl = fsrs.next_interval(data.stability);
         if (newitvl !== data.scheduled_days) {
             reCnt++;
-            item.updateDueInterval(newitvl);
+            item.updateDueByInterval(newitvl);
         }
     });
 

@@ -7,6 +7,7 @@ import { debug } from "./util/utils_recall";
 import { postponeItems } from "./algorithms/balance/postpone";
 import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
 import { reschedule } from "./algorithms/balance/reschedule";
+import { GetInputModal } from "./gui/getInputModal";
 
 export default class Commands {
     plugin: ObsidianSrsPlugin;
@@ -242,24 +243,59 @@ export default class Commands {
                 postponeItems(plugin.store.items.filter((item) => item.isTracked));
             },
         });
-        // plugin.addCommand({
-        //     id: "postpone-manual",
-        //     name: "Postpone after x days(wip)",
-        //     callback: () => {
-        //         return;
-        //         const reviewDeckNames: string[] = Object.keys(plugin.reviewDecks);
-        //         const cardItems = plugin.store.items.filter(
-        //             (item) => item.isCard && item.isTracked,
-        //         );
-        //         const cardDeckNames: string[] = cardItems.map((item) => item.deckName).unique();
-        //         const deckSelectionModal = new ReviewDeckSelectionModal(
-        //             plugin.app,
-        //             reviewDeckNames,
-        //         );
-        //         deckSelectionModal.submitCallback = (deck: string) => plugin.reviewNextNote(deck);
-        //         deckSelectionModal.open();
-        //         postponeItems(plugin.store.items.filter((item) => item.isTracked));
-        //     },
-        // });
+
+        plugin.addCommand({
+            id: "postpone-note-manual",
+            name: "Postpone this note after x days",
+            checkCallback: (checking: boolean) => {
+                const file = plugin.app.workspace.getActiveFile();
+                if (file != null) {
+                    if (plugin.store.getTrackedFile(file.path)?.isTrackedNote) {
+                        if (!checking) {
+                            const tkfile = plugin.store.getTrackedFile(file.path);
+                            const input = new GetInputModal(
+                                plugin.app,
+                                "please input positive number",
+                            );
+                            input.submitCallback = (days: number) => {
+                                postponeItems([plugin.store.getItembyID(tkfile.noteID)], days);
+                                plugin.store.save();
+                                plugin.sync();
+                            };
+                            input.open();
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
+        });
+
+        plugin.addCommand({
+            id: "postpone-cards-manual",
+            name: "Postpone cards in this note after x days",
+            checkCallback: (checking: boolean) => {
+                const file = plugin.app.workspace.getActiveFile();
+                if (file != null) {
+                    if (plugin.store.getTrackedFile(file.path)?.isTracked) {
+                        if (!checking) {
+                            const tkfile = plugin.store.getTrackedFile(file.path);
+                            const input = new GetInputModal(
+                                plugin.app,
+                                "please input positive number",
+                            );
+                            input.submitCallback = (days: number) =>
+                                postponeItems(tkfile.cardIDs.map(plugin.store.getItembyID), days);
+                            input.open();
+
+                            // plugin.store.save();
+                            plugin.sync();
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
+        });
     }
 }
