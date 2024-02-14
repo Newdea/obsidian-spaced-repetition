@@ -98,8 +98,8 @@ export class RepetitionItem {
      * @return {*}
      */
     reviewUpdate(result: ReviewResult) {
-        this.nextReview = DateUtils.fromNow(result.nextReview).getTime();
-        this.updateDueByInterval(this.interval);
+        let newitvl = balance(result.nextReview / DateUtils.DAYS_TO_MILLIS, this.itemType);
+        this.nextReview = DateUtils.fromNow(newitvl * DateUtils.DAYS_TO_MILLIS).getTime();
         this.timesReviewed += 1;
         if (result.correct) {
             this.timesCorrect += 1;
@@ -203,6 +203,7 @@ export class RepetitionItem {
         if (enableBalance) {
             let days = Math.max(0, newdue - now) / DateUtils.DAYS_TO_MILLIS;
             days = balance(days, this.itemType);
+            console.debug("days:", days);
             let nextInterval = days * DateUtils.DAYS_TO_MILLIS;
             newdue = nextInterval + now;
         }

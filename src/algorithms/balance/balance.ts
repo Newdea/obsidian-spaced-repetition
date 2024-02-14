@@ -19,14 +19,13 @@ function getDueDates(itemType: string) {
 /**
  * balance review counts in a day, return new interval day.
  * @param interval days till next review
- * @param dueDates
+ * @param type: RPITEMTYPE,
  * @param maximumInterval default = 36525
  * @returns
  */
 export function balance(
     interval: number,
     type: RPITEMTYPE,
-    // dueDates: Record<number, number>,
     maximumInterval: number = 36525,
     lowestCount: number = 10,
     tolerance: number = 5,
