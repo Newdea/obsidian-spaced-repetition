@@ -495,10 +495,7 @@ export class FlashcardModal extends Modal {
 
     private processReviewbyAlgo(response: ReviewResponse) {
         const algo = this.plugin.algorithm;
-        setDueDates(
-            this.plugin.noteStats.delayedDays.dict,
-            this.plugin.noteStats.delayedDays.dict,
-        );
+        setDueDates(this.plugin.noteStats.delayedDays.dict, this.plugin.noteStats.delayedDays.dict);
         const opt = algo.srsOptions()[response];
         const store = this.plugin.store;
         const id = this.currentCard.Id;
