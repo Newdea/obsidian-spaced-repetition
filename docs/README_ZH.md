@@ -13,7 +13,10 @@
 5. 算法可以切换：默认的 Anki 优化算法、Anki 算法、[Fsrs 算法](https://github.com/open-spaced-repetition/fsrs.js)；
 6. 使用 Fsrs 算法时，可根据标签输出重复日志文件 `ob_revlog.csv`，以使用[optimizer](https://github.com/open-spaced-repetition/fsrs-optimizer) 优化算法参数，达到更好的复习效果；
 7. 数据表中新增笔记复习情况、当天复习情况；
-8. 其他待发现的小改动；
+8. 延后笔记/卡片;
+9. 修改笔记/卡片在x天后复习;
+10. 重排所有已排程的复习项； 
+11. 其他待发现的小改动；
 
 **注意**
 没有使用过 obsidian-spaced-repetition 插件的可以直接用，正在使用 obsidian-spaced-repetition 插件的话，建议试用前先备份 :yum:

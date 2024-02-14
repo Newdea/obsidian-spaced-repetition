@@ -70,6 +70,19 @@ Centralized (CRAM) review/normal review of cards within the current/all notes (i
 
 Centralized Review (CRAM) mode, no review data is updated.
 
+#### Postpone 
+Postpone notes/cards (with current retention greater than 65%) from before today(excluded)
+
+*If you are not satisfied with the new schedule, simply restart Obsidian to restore the previous schedule. The new schedule is not saved until after reviewing a note/card.*
+
+#### Postpone after x days
+Review the specified notes/cards after x days without judging their current review time and retention rate.
+*It is recommended that you only modify individual notes or cards within notes, not a large number of them, to avoid reviewing too much content on that day.*
+
+#### Reschedule
+Recalculates the next review time for all **already scheduled** notes/cards based on the parameters in the settings and before the notes/cards.
+*If you are not satisfied with the new schedule, simply restart Obsidian to restore the previous schedule. The new schedule is not saved until after reviewing a note/card.*
+
 #### View data statistics
 
 Via command line, `SR view statistics`

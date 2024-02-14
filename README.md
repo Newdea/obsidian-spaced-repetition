@@ -19,7 +19,10 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 -   show floatbar for reviewing response when reviewing note by click statusbar or review command or sidebar, and can set whether showing the interval or not;
 -   Reviewing a Notes directly [#635];
 -   when using fsrs, output `ob-revlog.csv`, to optimize the algorithm parameters using [optimizer](https://github.com/open-spaced-repetition/fsrs-optimizer) for better review;
--   Statistics: add note view statistics,and today review statistics.
+-   Statistics: add note view statistics,and today review statistics;
+-   Postpone notes/cards;
+-   postpone to review after x days;
+-   reschedule all scheduled items;
 
 ## Maintainers Wanted
 
