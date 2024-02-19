@@ -118,14 +118,14 @@ export class ItemToDecks {
         let now_number: number = now;
         const nowToday: number = DateUtils.EndofToday;
 
-        if (!trackedFile.isDefault && (item == null || !item.isTracked)) {
-            item.setTracked(ind);
-        }
         if (item == null) {
             // store._updateItem(fileid, ind, RPITEMTYPE.NOTE, rdeck.deckName);
             // item = store.getItembyID(fileid);
             console.debug("syncRCDataToSRrevDeck update null item:", item, trackedFile);
             return;
+        }
+        if (!trackedFile.isDefault && !item.isTracked) {
+            item.setTracked(ind);
         }
         const latterQue = store.data.queues.toDayLatterQueue;
         delete latterQue[fileid];

@@ -5,7 +5,7 @@ import { FsrsAlgorithm, FsrsData } from "../fsrs";
 
 export function reschedule(items: RepetitionItem[]): RepetitionItem[] {
     let reCnt = 0;
-    console.group(`reschedule`);
+    console.group("reschedule");
     if (items[0].isFsrs) {
         const result = reschedule_fsrs(items);
         reCnt = result.reCnt;

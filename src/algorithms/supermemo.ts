@@ -2,7 +2,6 @@ import { DateUtils, MiscUtils } from "src/util/utils_recall";
 import { SrsAlgorithm, algorithmNames } from "./algorithms";
 import deepcopy from "deepcopy";
 import { AnkiAlgorithm, AnkiSettings } from "./anki";
-import { balance } from "./balance/balance";
 import { RepetitionItem, ReviewResult } from "src/dataStore/repetitionItem";
 
 interface Sm2Data {
@@ -78,7 +77,7 @@ export class Sm2Algorithm extends SrsAlgorithm {
                 nextReview: nextReview * DateUtils.DAYS_TO_MILLIS,
             };
         } else {
-            let nextReview = interval(data.iteration);
+            const nextReview = interval(data.iteration);
             data.iteration += 1;
             data.ease = data.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
             if (data.ease < 1.3) {

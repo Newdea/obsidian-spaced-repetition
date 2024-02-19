@@ -892,7 +892,7 @@ export default class SRPlugin extends Plugin {
         await this.saveData(this.data);
     }
 
-    initView(): void {
+    async initView(): Promise<void> {
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
             (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
@@ -902,10 +902,11 @@ export default class SRPlugin extends Plugin {
             this.data.settings.enableNoteReviewPaneOnStartup &&
             this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE).length == 0
         ) {
-            this.app.workspace.getRightLeaf(false).setViewState({
+            await this.app.workspace.getRightLeaf(false).setViewState({
                 type: REVIEW_QUEUE_VIEW_TYPE,
                 active: true,
             });
+            this.reviewQueueView = this.app.workspace.getActiveViewOfType(ReviewQueueListView);
         }
     }
 
