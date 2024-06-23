@@ -55,6 +55,7 @@ export class ReviewView {
                     if (settings.autoNextNote) {
                         this.recallReviewNote(settings);
                     }
+                    console.debug("go this way");
                 });
             }
         }
@@ -65,7 +66,7 @@ export class ReviewView {
         });
 
         this.plugin.app.workspace.setActiveLeaf(leaf);
-
+        // this.plugin.updateStatusBar();   // reviewDeck 没有更新，不会起作用的
         if (item != null) {
             const newstate = leaf.getViewState();
             console.debug(newstate);
@@ -74,10 +75,9 @@ export class ReviewView {
 
         ReviewView.nextReviewNotice(IReviewNote.minNextView, store.data.queues.laterSize);
 
-        this.plugin.updateStatusBar();
-
         reviewFloatBar.selfDestruct();
         new Notice(t("ALL_CAUGHT_UP"));
+        this.plugin.sync();
     }
 
     static nextReviewNotice(minNextView: number, laterSize: number) {
