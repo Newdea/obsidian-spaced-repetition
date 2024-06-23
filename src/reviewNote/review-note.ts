@@ -3,7 +3,6 @@ import { SrsAlgorithm } from "src/algorithms/algorithms";
 import { DataStore } from "src/dataStore/data";
 import { DataLocation } from "src/dataStore/dataLocation";
 import { ItemToDecks } from "src/dataStore/itemToDecks";
-import { reviewResponseModal } from "src/gui/reviewresponse-modal";
 import { t } from "src/lang/helpers";
 import SRPlugin from "src/main";
 import { NoteEaseList } from "src/NoteEaseList";
@@ -18,8 +17,8 @@ type Tsync = (notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList) =>
 export type TrespResult = { sNote: SchedNote; buryList?: string[] };
 type TsaveResponse = (note: TFile, response: ReviewResponse, ease: number) => Promise<TrespResult>;
 
-export abstract class ReviewNote {
-    private static _instance: ReviewNote;
+export abstract class IReviewNote {
+    private static _instance: IReviewNote;
     static itemId: number;
     static minNextView: number;
 
@@ -47,15 +46,15 @@ export abstract class ReviewNote {
     }
 
     static getInstance() {
-        if (!ReviewNote._instance) {
+        if (!IReviewNote._instance) {
             throw Error("there is not ReviewNote instance.");
         }
-        return ReviewNote._instance;
+        return IReviewNote._instance;
     }
 
     constructor(settings: SRSettings) {
         this.settings = settings;
-        ReviewNote._instance = this;
+        IReviewNote._instance = this;
     }
 
     /**
@@ -99,55 +98,6 @@ export abstract class ReviewNote {
         response: ReviewResponse,
         ease: number,
     ): Promise<TrespResult>;
-
-    static recallReviewNote(settings: SRSettings) {
-        // const plugin = this.plugin;
-        const store = DataStore.getInstance();
-        const reviewFloatBar = reviewResponseModal.getInstance();
-        // const settings = plugin.data.settings;
-        const que = store.data.queues;
-        que.buildQueue();
-        const item = store.getNext();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const state: any = { mode: "empty" };
-        if (item != null && item.isTracked) {
-            this.itemId = item.ID;
-            console.debug("item:", item, que.queueSize());
-            const path = store.getFilePath(item);
-            if (path != null) {
-                state.file = path;
-                state.item = que.getNextId();
-                // state.mode = "question";
-
-                reviewFloatBar.display(item, (opt) => {
-                    this.recallReviewResponse(this.itemId, opt);
-                    if (settings.autoNextNote) {
-                        this.recallReviewNote(settings);
-                    }
-                });
-            }
-        }
-        const leaf = app.workspace.getLeaf();
-        leaf.setViewState({
-            type: "markdown",
-            state: state,
-        });
-
-        app.workspace.setActiveLeaf(leaf);
-
-        if (item != null) {
-            const newstate = leaf.getViewState();
-            console.debug(newstate);
-            return;
-        }
-
-        this.nextReviewNotice(store.data.queues.laterSize);
-
-        // plugin.updateStatusBar();
-
-        reviewFloatBar.selfDestruct();
-        new Notice(t("ALL_CAUGHT_UP"));
-    }
 
     static recallReviewResponse(itemId: number, response: string) {
         const store = DataStore.getInstance();
@@ -200,33 +150,21 @@ export abstract class ReviewNote {
         return index;
     }
 
-    static updateminNextView(minNextView: number, nextReview: number): number {
+    static updateminNextView(mnv: number, nextReview: number): number {
         const now = Date.now();
         const nowToday: number = globalDateProvider.endofToday.valueOf();
 
         if (nextReview <= nowToday) {
-            if (minNextView == undefined || minNextView < now || minNextView > nextReview) {
-                // console.debug("interval diff:should be - (", minNextView - nextReview);
-                minNextView = nextReview;
+            if (mnv == undefined || mnv < now || mnv > nextReview) {
+                // console.debug("interval diff:should be - (", mnv - nextReview);
+                mnv = nextReview;
             }
         }
-        return minNextView;
-    }
-
-    static nextReviewNotice(laterSize: number) {
-        if (this.minNextView > 0 && laterSize > 0) {
-            const now = Date.now();
-            const interval = Math.round((this.minNextView - now) / 1000 / 60);
-            if (interval < 60) {
-                new Notice("可以在" + interval + "分钟后来复习");
-            } else if (interval < 60 * 5) {
-                new Notice("可以在" + interval / 60 + "小时后来复习");
-            }
-        }
+        return mnv;
     }
 }
 
-class RNonNote extends ReviewNote {
+class RNonNote extends IReviewNote {
     tagCheck: (note: TFile) => boolean;
     isNew: (note: TFile) => boolean;
     sync: (notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList) => Promise<void>;
@@ -247,7 +185,7 @@ class RNonNote extends ReviewNote {
     }
 }
 
-class RNonTrackfiles extends ReviewNote {
+export class RNonTrackfiles extends IReviewNote {
     private store = DataStore.getInstance();
     // @logExecutionTime()
     async sync(notes: TFile[], reviewDecks: Decks, easeByPath: NoteEaseList): Promise<void> {
@@ -304,7 +242,7 @@ class RNonTrackfiles extends ReviewNote {
             }
         }
 
-        ReviewNote.recallReviewResponse(itemId, option);
+        IReviewNote.recallReviewResponse(itemId, option);
 
         // preUpdateDeck(deck, note);
         // ItemToDecks.toRevDeck(deck, note, now);

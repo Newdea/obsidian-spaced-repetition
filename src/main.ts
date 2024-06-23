@@ -59,13 +59,14 @@ import { ReleaseNotes } from "src/gui/ReleaseNotes";
 import { algorithms } from "src/algorithms/algorithms_switch";
 import { DataLocation } from "./dataStore/dataLocation";
 import { addFileMenuEvt, registerTrackFileEvents } from "./Events/trackFileEvents";
-import { ReviewNote } from "src/reviewNote/review-note";
 import { ItemToDecks } from "./dataStore/itemToDecks";
 import { LinkRank } from "src/algorithms/priorities/linkPageranks";
 import { Queue } from "./dataStore/queue";
 import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
 import { setDueDates } from "./algorithms/balance/balance";
 import { RepetitionItem } from "./dataStore/repetitionItem";
+import { IReviewNote } from "./reviewNote/review-note";
+import { ReviewView } from "./gui/reviewView";
 
 interface PluginData {
     settings: SRSettings;
@@ -153,13 +154,14 @@ export default class SRPlugin extends Plugin {
         settings.algorithmSettings[settings.algorithm] = this.algorithm.settings;
         this.savePluginData();
 
-        ReviewNote.create(
+        IReviewNote.create(
             settings,
             this.sync_onNote.bind(this),
             this.tagCheck.bind(this),
             this.noteIsNew.bind(this),
             this.saveReviewResponse_onNote.bind(this),
         );
+        ReviewView.create(this, this.data.settings);
         this.commands = new Commands(this);
         this.commands.addCommands();
         if (this.data.settings.showDebugMessages) {
@@ -443,7 +445,7 @@ export default class SRPlugin extends Plugin {
                 }
             }),
         );
-        await ReviewNote.getInstance().sync(notes, this.reviewDecks, this.easeByPath);
+        await IReviewNote.getInstance().sync(notes, this.reviewDecks, this.easeByPath);
 
         // Reviewable cards are all except those with the "edit later" tag
         this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
@@ -588,7 +590,7 @@ export default class SRPlugin extends Plugin {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
-        const revnote = ReviewNote.getInstance();
+        const revnote = IReviewNote.getInstance();
         if (!revnote.tagCheck(note)) {
             return;
         }
@@ -770,7 +772,7 @@ export default class SRPlugin extends Plugin {
         } else if (this.data.settings.reviewingNoteDirectly) {
             const rdname =
                 this.lastSelectedReviewDeck ??
-                ReviewNote.getDeckNameForReviewDirectly(this.reviewDecks) ??
+                IReviewNote.getDeckNameForReviewDirectly(this.reviewDecks) ??
                 reviewDeckNames[0];
             this.reviewNextNote(rdname);
         } else {
@@ -819,7 +821,7 @@ export default class SRPlugin extends Plugin {
             }
         };
 
-        index = ReviewNote.getNextDueNoteIndex(
+        index = IReviewNote.getNextDueNoteIndex(
             deck.dueNotesCount,
             this.data.settings.openRandomNote,
         );
@@ -867,14 +869,14 @@ export default class SRPlugin extends Plugin {
             this.data.settings.reviewingNoteDirectly &&
             this.noteStats.onDueCount + this.noteStats.newCount > 0
         ) {
-            const rdname: string = ReviewNote.getDeckNameForReviewDirectly(this.reviewDecks);
+            const rdname: string = IReviewNote.getDeckNameForReviewDirectly(this.reviewDecks);
             if (rdname != undefined) {
                 this.reviewNextNote(rdname);
                 return;
             }
         }
 
-        ReviewNote.nextReviewNotice(Queue.getInstance().laterSize);
+        ReviewView.nextReviewNotice(IReviewNote.minNextView, Queue.getInstance().laterSize);
 
         this.reviewFloatBar.selfDestruct();
         this.reviewQueueView.redraw();
