@@ -49,7 +49,6 @@ import { SrsAlgorithm, algorithmNames } from "src/algorithms/algorithms";
 
 import { reviewResponseModal } from "src/gui/reviewresponse-modal";
 import {
-    DateUtils,
     debug,
     isVersionNewerThanOther,
     logExecutionTime,
@@ -61,7 +60,6 @@ import { algorithms } from "src/algorithms/algorithms_switch";
 import { DataLocation } from "./dataStore/dataLocation";
 import { addFileMenuEvt, registerTrackFileEvents } from "./Events/trackFileEvents";
 import { ReviewNote } from "src/reviewNote/review-note";
-import { Tags } from "./tags";
 import { ItemToDecks } from "./dataStore/itemToDecks";
 import { LinkRank } from "src/algorithms/priorities/linkPageranks";
 import { Queue } from "./dataStore/queue";
@@ -126,8 +124,13 @@ export default class SRPlugin extends Plugin {
     public settingTab: SRSettingTab;
 
     public clock_start: number;
+    private static _instance: SRPlugin;
+    static getInstance() {
+        return SRPlugin._instance;
+    }
 
     async onload(): Promise<void> {
+        SRPlugin._instance = this;
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
@@ -154,6 +157,7 @@ export default class SRPlugin extends Plugin {
             settings,
             this.sync_onNote.bind(this),
             this.tagCheck.bind(this),
+            this.noteIsNew.bind(this),
             this.saveReviewResponse_onNote.bind(this),
         );
         this.commands = new Commands(this);
@@ -584,12 +588,15 @@ export default class SRPlugin extends Plugin {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
-        const ease = this.getLinkedEase(note);
         const revnote = ReviewNote.getInstance();
         if (!revnote.tagCheck(note)) {
             return;
         }
 
+        let ease: number;
+        if (revnote.isNew && settings.algorithm !== algorithmNames.Fsrs) {
+            ease = this.linkRank.getContribution(note, this.easeByPath).ease;
+        }
         const result = await revnote.responseProcess(note, response, ease);
         if (settings.burySiblingCardsByNoteReview) {
             this.data.buryList.push(...result.buryList);
@@ -623,6 +630,16 @@ export default class SRPlugin extends Plugin {
         return true;
     }
 
+    noteIsNew(note: TFile): boolean {
+        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
+        return !(
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+        );
+    }
     async saveReviewResponse_onNote(note: TFile, response: ReviewResponse, ease: number) {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
@@ -639,7 +656,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             )
         ) {
-            // ease = this.linkRank.getContribution(note, this.easeByPath).ease;
+            ease = this.linkRank.getContribution(note, this.easeByPath).ease;
             ease = Math.round(ease);
             interval = 1.0;
             delayBeforeReview = 0;
@@ -943,17 +960,5 @@ export default class SRPlugin extends Plugin {
                 ),
             }),
         );
-    }
-
-    getLinkedEase(note: TFile) {
-        const settings = this.data.settings;
-        if (
-            settings.algorithm === algorithmNames.Anki ||
-            settings.algorithm === algorithmNames.Default ||
-            settings.algorithm === algorithmNames.SM2
-        ) {
-            const ease = this.linkRank.getContribution(note, this.easeByPath).ease;
-            return ease;
-        }
     }
 }

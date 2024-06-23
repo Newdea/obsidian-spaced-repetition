@@ -32,11 +32,12 @@ export abstract class ReviewNote {
         settings: SRSettings,
         sync: Tsync,
         tagCheck: (note: TFile) => boolean,
+        isNew: (note: TFile) => boolean,
         saveResponse: TsaveResponse,
     ) {
         switch (settings.dataLocation) {
             case DataLocation.SaveOnNoteFile:
-                return new RNonNote(settings, sync, tagCheck, saveResponse);
+                return new RNonNote(settings, sync, tagCheck, isNew, saveResponse);
                 break;
 
             default:
@@ -91,7 +92,7 @@ export abstract class ReviewNote {
     }
 
     abstract tagCheck(note: TFile): boolean;
-
+    abstract isNew(note: TFile): boolean;
     abstract sync(notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList): Promise<void>;
     abstract responseProcess(
         note: TFile,
@@ -226,34 +227,41 @@ export abstract class ReviewNote {
 }
 
 class RNonNote extends ReviewNote {
+    tagCheck: (note: TFile) => boolean;
+    isNew: (note: TFile) => boolean;
+    sync: (notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList) => Promise<void>;
+    responseProcess: (note: TFile, response: ReviewResponse, ease: number) => Promise<TrespResult>;
+
     constructor(
         settings: SRSettings,
         sync: Tsync,
         tagCheck: (note: TFile) => boolean,
+        isNew: (note: TFile) => boolean,
         saveResponse: TsaveResponse,
     ) {
         super(settings);
         this.sync = sync;
         this.tagCheck = tagCheck;
+        this.isNew = isNew;
         this.responseProcess = saveResponse;
     }
 }
 
 class RNonTrackfiles extends ReviewNote {
+    private store = DataStore.getInstance();
     // @logExecutionTime()
     async sync(notes: TFile[], reviewDecks: Decks, easeByPath: NoteEaseList): Promise<void> {
         // const settings = this.data.settings;
-        const store = DataStore.getInstance();
-        store.data.queues.buildQueue();
+        this.store.data.queues.buildQueue();
 
         // check trackfile
-        await store.reLoad();
+        await this.store.reLoad();
 
         ItemToDecks.create(this.settings).itemToReviewDecks(reviewDecks, notes, easeByPath);
     }
 
     tagCheck(note: TFile): boolean {
-        const store = DataStore.getInstance();
+        const store = this.store;
 
         let deckName = Tags.getNoteDeckName(note, this.settings);
         if (
@@ -271,8 +279,11 @@ class RNonTrackfiles extends ReviewNote {
         if (deckName == null) return false;
         return true;
     }
+    isNew(note: TFile): boolean {
+        return this.store.getNoteItem(note.path).isNew;
+    }
     async responseProcess(note: TFile, response: ReviewResponse, ease?: number) {
-        const store = DataStore.getInstance();
+        const store = this.store;
 
         const option = SrsAlgorithm.getInstance().srsOptions()[response];
         const now = Date.now();
@@ -308,23 +319,6 @@ class RNonTrackfiles extends ReviewNote {
             },
         };
     }
-}
-
-function preUpdateDeck(deck: ReviewDeck, note: TFile) {
-    const newindex = deck.newNotes.findIndex((sNote, _index) => {
-        return sNote.note === note;
-    });
-    if (newindex >= 0) {
-        // isNew
-        deck.newNotes.splice(newindex, 1);
-    } else {
-        //isDued
-        const index = deck.scheduledNotes.findIndex((sNote, _index) => {
-            return sNote.note === note;
-        });
-        deck.scheduledNotes.splice(index, 1);
-    }
-    return;
 }
 
 export function updatenDays(dueDates: Record<number, number>, dueUnix: number) {
