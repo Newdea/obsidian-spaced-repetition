@@ -12,9 +12,7 @@ export class ReviewView {
     itemId: number;
 
     private plugin: SRPlugin;
-    settings: SRSettings;
-    // public reviewDecks: Decks = {};
-    // public easeByPath: NoteEaseList;
+    private settings: SRSettings;
 
     static create(plugin: SRPlugin, settings: SRSettings) {
         return new ReviewView(plugin, settings);
@@ -76,7 +74,7 @@ export class ReviewView {
 
         ReviewView.nextReviewNotice(IReviewNote.minNextView, store.data.queues.laterSize);
 
-        // plugin.updateStatusBar();
+        this.plugin.updateStatusBar();
 
         reviewFloatBar.selfDestruct();
         new Notice(t("ALL_CAUGHT_UP"));

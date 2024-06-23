@@ -244,8 +244,6 @@ export class RNonTrackfiles extends IReviewNote {
 
         IReviewNote.recallReviewResponse(itemId, option);
 
-        // preUpdateDeck(deck, note);
-        // ItemToDecks.toRevDeck(deck, note, now);
         return {
             buryList,
             sNote: {
