@@ -59,7 +59,7 @@ import { ReleaseNotes } from "src/gui/ReleaseNotes";
 import { algorithms } from "src/algorithms/algorithms_switch";
 import { DataLocation } from "./dataStore/dataLocation";
 import { addFileMenuEvt, registerTrackFileEvents } from "./Events/trackFileEvents";
-import { ItemToDecks } from "./dataStore/itemToDecks";
+import { ItemTrans } from "./dataStore/itemTrans";
 import { LinkRank } from "src/algorithms/priorities/linkPageranks";
 import { Queue } from "./dataStore/queue";
 import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
@@ -576,7 +576,7 @@ export default class SRPlugin extends Plugin {
         );
 
         const note: Note = await loader.load(srFile, folderTopicPath);
-        ItemToDecks.updateCardsSchedbyItems(note, folderTopicPath);
+        ItemTrans.updateCardsSchedbyItems(note, folderTopicPath);
         note.createMultiCloze(this.data.settings);
         if (note.hasChanged) {
             note.writeNoteFile(this.data.settings);
@@ -723,7 +723,7 @@ export default class SRPlugin extends Plugin {
         return { sNote: snote, buryList };
     }
 
-    private postponeResponse(note: TFile, sNote: SchedNote) {
+    postponeResponse(note: TFile, sNote: SchedNote) {
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
             let wasDueInDeck = false;
             reviewDeck.scheduledNotes.findIndex((newNote, ind) => {

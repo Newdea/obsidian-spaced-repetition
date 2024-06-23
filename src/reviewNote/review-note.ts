@@ -2,7 +2,7 @@ import { Notice, TFile } from "obsidian";
 import { SrsAlgorithm } from "src/algorithms/algorithms";
 import { DataStore } from "src/dataStore/data";
 import { DataLocation } from "src/dataStore/dataLocation";
-import { ItemToDecks } from "src/dataStore/itemToDecks";
+import { ItemTrans } from "src/dataStore/itemTrans";
 import { t } from "src/lang/helpers";
 import { NoteEaseList } from "src/NoteEaseList";
 import { Decks, ReviewDeck, SchedNote } from "src/ReviewDeck";
@@ -194,7 +194,7 @@ export class RNonTrackfiles extends IReviewNote {
         // check trackfile
         await this.store.reLoad();
 
-        ItemToDecks.create(this.settings).itemToReviewDecks(reviewDecks, notes, easeByPath);
+        ItemTrans.create(this.settings).itemToReviewDecks(reviewDecks, notes, easeByPath);
     }
 
     tagCheck(note: TFile): boolean {
