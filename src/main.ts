@@ -175,9 +175,9 @@ export default class SRPlugin extends Plugin {
 
         registerTrackFileEvents(this);
 
-        // if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
-        //     this.registerInterval(window.setInterval(() => this.sync(), 5 * 60 * 1000));
-        // }
+        if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            this.registerInterval(window.setInterval(() => this.store.save(), 5 * 60 * 1000));
+        }
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
