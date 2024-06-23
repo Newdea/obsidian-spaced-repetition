@@ -9,7 +9,6 @@ import { ReviewResponse, schedule } from "./scheduling";
 import { SRSettings } from "./settings";
 import { formatDate_YYYY_MM_DD } from "./util/utils";
 import { DateUtil, globalDateProvider } from "./util/DateProvider";
-import { DateUtils } from "./util/utils_recall";
 
 export class CardScheduleInfo {
     dueDate: Moment;
