@@ -18,7 +18,7 @@ type Tsync = (notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList) =>
 export type TrespResult = { sNote: SchedNote; buryList?: string[] };
 type TsaveResponse = (note: TFile, response: ReviewResponse, ease: number) => Promise<TrespResult>;
 
-export class ReviewNote {
+export abstract class ReviewNote {
     private static _instance: ReviewNote;
     static itemId: number;
     static minNextView: number;
@@ -90,16 +90,14 @@ export class ReviewNote {
         return deckName;
     }
 
-    tagCheck(note: TFile): boolean {
-        throw new Error("not implemented");
-    }
+    abstract tagCheck(note: TFile): boolean;
 
-    async sync(notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList): Promise<void> {
-        throw new Error("not implemented");
-    }
-    responseProcess(note: TFile, response: ReviewResponse, ease: number): Promise<TrespResult> {
-        throw new Error("not implemented");
-    }
+    abstract sync(notes: TFile[], reviewDecks?: Decks, easeByPath?: NoteEaseList): Promise<void>;
+    abstract responseProcess(
+        note: TFile,
+        response: ReviewResponse,
+        ease: number,
+    ): Promise<TrespResult>;
 
     static recallReviewNote(settings: SRSettings) {
         // const plugin = this.plugin;
