@@ -55,7 +55,6 @@ export class ReviewView {
                     if (settings.autoNextNote) {
                         this.recallReviewNote(settings);
                     }
-                    console.debug("go this way");
                 });
             }
         }

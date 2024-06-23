@@ -4,7 +4,6 @@ import { DataStore } from "src/dataStore/data";
 import { DataLocation } from "src/dataStore/dataLocation";
 import { ItemToDecks } from "src/dataStore/itemToDecks";
 import { t } from "src/lang/helpers";
-import SRPlugin from "src/main";
 import { NoteEaseList } from "src/NoteEaseList";
 import { Decks, ReviewDeck, SchedNote } from "src/ReviewDeck";
 import { ReviewResponse } from "src/scheduling";
