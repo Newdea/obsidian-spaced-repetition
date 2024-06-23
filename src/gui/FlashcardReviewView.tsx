@@ -377,7 +377,7 @@ export class FlashcardReviewView {
 
     private _processReviewbyAlgo(response: ReviewResponse) {
         const algo = this.plugin.algorithm;
-        setDueDates(this.plugin.noteStats.delayedDays.dict, this.plugin.noteStats.delayedDays.dict);
+        setDueDates(this.plugin.cardStats.delayedDays.dict, this.plugin.cardStats.delayedDays.dict);
         const opt = algo.srsOptions()[response];
         const store = this.plugin.store;
         const id = this._currentCard.Id;
