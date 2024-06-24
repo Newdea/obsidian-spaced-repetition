@@ -506,7 +506,7 @@ export class FlashcardReviewView {
             const srfile = this._currentNote.file as SrTFile;
             const store = this.plugin.store;
             const id = this._currentCard.Id;
-            const infoM = new ItemInfoModal(this.settings, srfile.file, store.getItembyID(id));
+            const infoM = new ItemInfoModal(this.plugin, srfile.file, store.getItembyID(id));
             infoM.open();
         });
     }
