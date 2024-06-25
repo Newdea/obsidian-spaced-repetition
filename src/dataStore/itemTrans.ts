@@ -118,7 +118,10 @@ export class ItemTrans {
         const store = DataStore.getInstance();
         const settings = store.settings;
         const noteFile: SrTFile = note.file as SrTFile;
-        if (topicPath.isEmptyPath || settings.dataLocation === DataLocation.SaveOnNoteFile) {
+        if (
+            note.questionList.length === 0 ||
+            settings.dataLocation === DataLocation.SaveOnNoteFile
+        ) {
             return;
         }
         if (store.getFileIndex(note.filePath) < 0) {
