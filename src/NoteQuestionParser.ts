@@ -317,7 +317,7 @@ export class NoteQuestionParser {
     //
     private determineQuestionTopicPathList(question: Question): TopicPathList {
         let result: TopicPathList;
-        if (this.settings.convertFoldersToDecks || this.settings.trackedNoteToDecks) {
+        if (this.settings.convertFoldersToDecks) {
             result = new TopicPathList([this.folderTopicPath]);
         } else {
             // If present, the question specific TopicPath takes precedence over everything else
@@ -347,6 +347,9 @@ export class NoteQuestionParser {
                     result = this.createTopicPathList_FromSingleTag(this.flashcardTagList[0]);
                 }
             }
+        }
+        if (!result && this.settings.trackedNoteToDecks && this.folderTopicPath) {
+            result = new TopicPathList([this.folderTopicPath]);
         }
         return result;
     }
