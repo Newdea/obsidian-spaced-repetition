@@ -1,14 +1,15 @@
-import { ButtonComponent, Modal, Setting, TFile } from "obsidian";
+import { ButtonComponent, MarkdownRenderer, Modal, Setting, TFile } from "obsidian";
 import { algorithmNames } from "src/algorithms/algorithms";
 import { AnkiData } from "src/algorithms/anki";
 import { FsrsData } from "src/algorithms/fsrs";
 import { DataStore } from "src/dataStore/data";
 import { RepetitionItem } from "src/dataStore/repetitionItem";
 import { TrackedFile } from "src/dataStore/trackedFile";
+import SRPlugin from "src/main";
 import { SRSettings } from "src/settings";
 
 export class ItemInfoModal extends Modal {
-    // plugin: ObsidianSrsPlugin;
+    plugin: SRPlugin;
     store: DataStore;
     settings: SRSettings;
     file: TFile;
@@ -16,11 +17,11 @@ export class ItemInfoModal extends Modal {
     nextReview: number;
     lastInterval: number;
 
-    constructor(settings: SRSettings, file: TFile, item: RepetitionItem = null) {
+    constructor(plugin: SRPlugin, file: TFile, item: RepetitionItem = null) {
         super(app);
-        // this.plugin = plugin;
+        this.plugin = plugin;
         this.store = DataStore.getInstance();
-        this.settings = settings;
+        this.settings = plugin.data.settings;
         this.file = file;
         if (item == null) {
             this.item = this.store.getItemsOfFile(this.file.path)[0];
@@ -83,7 +84,8 @@ export class ItemInfoModal extends Modal {
         items.forEach((item) => {
             const divdetails = details.createEl("details");
             const divsummary = divdetails.createEl("summary");
-            divsummary.setText("ID:" + item.ID.toString());
+            const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
+            divsummary.setText(`ID: ${item.ID} \t nextReivew: ${dt}`);
             const div = divdetails.createDiv();
             this.displayitem(div, item);
         });
@@ -100,42 +102,48 @@ export class ItemInfoModal extends Modal {
         //     contentEl.createDiv("li").setText(key+ ": "+ item[key])
         // });
         // type dataType = typeof plugin.algorithm.defaultData;
+        const title =
+            "key | value \n\
+            ---|---\n";
+        let tablestr = "";
         Object.keys(item).forEach((key) => {
             if (key != "data") {
-                new Setting(contentdiv).setDesc(key).addText((text) => {
-                    if (key === "nextReview") {
+                if (key === "nextReview") {
+                    new Setting(contentdiv).setDesc(key).addText((text) => {
                         this.nextReview = undefined;
                         const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
                         text.setValue(dt).onChange((value) => {
                             const nr = window.moment(value).valueOf();
                             this.nextReview = nr ?? 0;
                         });
-                    } else {
-                        text.setDisabled(true);
-                        text.setValue(item[key as keyof typeof item]?.toString());
-                    }
-                });
-            }
-        });
-        contentdiv.createEl("p").setText("Item.data info");
-
-        const data = item.data as AnkiData;
-        Object.keys(item.data).forEach((key) => {
-            new Setting(contentdiv).setDesc(key).addText((text) => {
-                key = key as keyof typeof item.data;
-                if (key === "lastInterval") {
-                    this.lastInterval = undefined;
-                    text.setValue(data[key]?.toString()).onChange((value) => {
-                        this.lastInterval = Number(value) ?? 0;
                     });
                 } else {
-                    text.setDisabled(true);
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    text.setValue(data[key]?.toString());
+                    tablestr += `| ${key} | ${item[key as keyof typeof item]} |\n`;
+                    // const span = contentdiv.createDiv("span");
+                    // span.setText(key + "\t: " + item[key as keyof typeof item]?.toString());
                 }
-            });
+            }
         });
+        MarkdownRenderer.render(this.plugin.app, title + tablestr, contentdiv, "", this.plugin);
+        contentdiv.createEl("p").setText("Item.data info");
+
+        tablestr = "";
+        Object.keys(item.data).forEach((key) => {
+            const dkey = key as keyof typeof item.data;
+            if (key === "lastInterval") {
+                const akey = key as keyof AnkiData;
+                new Setting(contentdiv).setDesc(key).addText((text) => {
+                    const data = item.data as AnkiData;
+                    this.lastInterval = undefined;
+                    text.setValue(data[akey]?.toString()).onChange((value) => {
+                        this.lastInterval = Number(value) ?? 0;
+                    });
+                });
+            } else {
+                tablestr += `| ${key} | ${item.data[dkey]} |\n`;
+            }
+        });
+        MarkdownRenderer.render(this.plugin.app, title + tablestr, contentdiv, "", this.plugin);
     }
 
     submit() {

@@ -38,7 +38,7 @@ export default class Commands {
                                 // decks: deck.scheduledNotes.map((sn) => [sn.note.path, sn.item]),
                                 que: store.data.queues.toDayLaterQueue,
                             });
-                            new ItemInfoModal(plugin.data.settings, file).open();
+                            new ItemInfoModal(plugin, file).open();
                         }
                         return true;
                     }
