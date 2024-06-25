@@ -796,7 +796,7 @@ export default class SRPlugin extends Plugin {
         let index = -1;
 
         const isPreviewUndueNote = (item: RepetitionItem) => {
-            return item.nextReview > Date.now() && !Queue.getInstance().isInLaterQueue(item.ID);
+            return item.nextReview > Date.now() && !item.isDue;
         };
         const fShowItemInfo = (item: RepetitionItem, msg: string) => {
             if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
