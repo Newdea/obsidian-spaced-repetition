@@ -1,12 +1,12 @@
 import { MarkdownView, Notice } from "obsidian";
 import ObsidianSrsPlugin from "./main";
-import { ReviewNote } from "src/reviewNote/review-note";
 import { ItemInfoModal } from "src/gui/info";
 import { Queue } from "./dataStore/queue";
 import { debug } from "./util/utils_recall";
 import { postponeItems } from "./algorithms/balance/postpone";
 import { reschedule } from "./algorithms/balance/reschedule";
 import { GetInputModal } from "./gui/getInputModal";
+import { ReviewView } from "./gui/reviewView";
 
 export default class Commands {
     plugin: ObsidianSrsPlugin;
@@ -38,7 +38,7 @@ export default class Commands {
                                 // decks: deck.scheduledNotes.map((sn) => [sn.note.path, sn.item]),
                                 que: store.data.queues.toDayLaterQueue,
                             });
-                            new ItemInfoModal(plugin.data.settings, file).open();
+                            new ItemInfoModal(plugin, file).open();
                         }
                         return true;
                     }
@@ -124,7 +124,7 @@ export default class Commands {
             name: "Review",
             callback: () => {
                 Queue.getInstance().buildQueue();
-                ReviewNote.recallReviewNote(this.plugin.data.settings);
+                ReviewView.getInstance().recallReviewNote(this.plugin.data.settings);
             },
         });
 

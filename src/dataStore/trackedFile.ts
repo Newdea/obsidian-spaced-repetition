@@ -175,6 +175,9 @@ export class TrackedFile implements ITrackedFile {
             settings.convertBoldTextToClozes,
             settings.convertCurlyBracketsToClozes,
         );
+        if (!this.hasCards && parsedCards.length === 0) {
+            return false;
+        }
 
         for (const parsedCard of parsedCards) {
             // deckPath = noteDeckPath;
@@ -218,7 +221,7 @@ export class TrackedFile implements ITrackedFile {
 
         // sync by total parsedCards.length
         if (!this.hasCards) {
-            return;
+            return false;
         }
         const carditems = this?.cardItems;
         if (lines.length === carditems.length && negIndFlag) {
@@ -233,7 +236,7 @@ export class TrackedFile implements ITrackedFile {
             }
         }
         // store.save();
-        return;
+        return true;
     }
 
     get lastTag() {

@@ -168,7 +168,6 @@ export function addSpecifiedFolderSetting(containerEl: HTMLElement, plugin: SRPl
                     plugin.data.settings.customFolder = cusFolder + "/" + cusFilename;
                     await locSwitch.moveStoreLocation();
                     await plugin.savePluginData();
-                    this.display();
                 }),
         );
 }

@@ -49,7 +49,6 @@ import { SrsAlgorithm, algorithmNames } from "src/algorithms/algorithms";
 
 import { reviewResponseModal } from "src/gui/reviewresponse-modal";
 import {
-    DateUtils,
     debug,
     isVersionNewerThanOther,
     logExecutionTime,
@@ -60,14 +59,14 @@ import { ReleaseNotes } from "src/gui/ReleaseNotes";
 import { algorithms } from "src/algorithms/algorithms_switch";
 import { DataLocation } from "./dataStore/dataLocation";
 import { addFileMenuEvt, registerTrackFileEvents } from "./Events/trackFileEvents";
-import { ReviewNote } from "src/reviewNote/review-note";
-import { Tags } from "./tags";
-import { ItemToDecks } from "./dataStore/itemToDecks";
+import { ItemTrans } from "./dataStore/itemTrans";
 import { LinkRank } from "src/algorithms/priorities/linkPageranks";
 import { Queue } from "./dataStore/queue";
 import { ReviewDeckSelectionModal } from "./gui/reviewDeckSelectionModal";
 import { setDueDates } from "./algorithms/balance/balance";
 import { RepetitionItem } from "./dataStore/repetitionItem";
+import { IReviewNote } from "./reviewNote/review-note";
+import { ReviewView } from "./gui/reviewView";
 
 interface PluginData {
     settings: SRSettings;
@@ -126,8 +125,13 @@ export default class SRPlugin extends Plugin {
     public settingTab: SRSettingTab;
 
     public clock_start: number;
+    private static _instance: SRPlugin;
+    static getInstance() {
+        return SRPlugin._instance;
+    }
 
     async onload(): Promise<void> {
+        SRPlugin._instance = this;
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
@@ -150,12 +154,14 @@ export default class SRPlugin extends Plugin {
         settings.algorithmSettings[settings.algorithm] = this.algorithm.settings;
         this.savePluginData();
 
-        ReviewNote.create(
+        IReviewNote.create(
             settings,
             this.sync_onNote.bind(this),
             this.tagCheck.bind(this),
+            this.noteIsNew.bind(this),
             this.saveReviewResponse_onNote.bind(this),
         );
+        ReviewView.create(this, this.data.settings);
         this.commands = new Commands(this);
         this.commands.addCommands();
         if (this.data.settings.showDebugMessages) {
@@ -169,9 +175,9 @@ export default class SRPlugin extends Plugin {
 
         registerTrackFileEvents(this);
 
-        // if (this.data.settings.dataLocation != DataLocation.SaveOnNoteFile) {
-        //     this.registerInterval(window.setInterval(() => this.sync(), 5 * 60 * 1000));
-        // }
+        if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            this.registerInterval(window.setInterval(() => this.store.save(), 5 * 60 * 1000));
+        }
 
         this.statusBar = this.addStatusBarItem();
         this.statusBar.classList.add("mod-clickable");
@@ -439,7 +445,7 @@ export default class SRPlugin extends Plugin {
                 }
             }),
         );
-        await ReviewNote.getInstance().sync(notes, this.reviewDecks, this.easeByPath);
+        await IReviewNote.getInstance().sync(notes, this.reviewDecks, this.easeByPath);
 
         // Reviewable cards are all except those with the "edit later" tag
         this.deckTree = DeckTreeFilter.filterForReviewableCards(fullDeckTree);
@@ -570,7 +576,7 @@ export default class SRPlugin extends Plugin {
         );
 
         const note: Note = await loader.load(srFile, folderTopicPath);
-        ItemToDecks.updateCardsSchedbyItems(note, folderTopicPath);
+        ItemTrans.updateCardsSchedbyItems(note, folderTopicPath);
         note.createMultiCloze(this.data.settings);
         if (note.hasChanged) {
             note.writeNoteFile(this.data.settings);
@@ -584,12 +590,15 @@ export default class SRPlugin extends Plugin {
             new Notice(t("NOTE_IN_IGNORED_FOLDER"));
             return;
         }
-        const ease = this.getLinkedEase(note);
-        const revnote = ReviewNote.getInstance();
+        const revnote = IReviewNote.getInstance();
         if (!revnote.tagCheck(note)) {
             return;
         }
 
+        let ease: number;
+        if (revnote.isNew && settings.algorithm !== algorithmNames.Fsrs) {
+            ease = this.linkRank.getContribution(note, this.easeByPath).ease;
+        }
         const result = await revnote.responseProcess(note, response, ease);
         if (settings.burySiblingCardsByNoteReview) {
             this.data.buryList.push(...result.buryList);
@@ -623,6 +632,16 @@ export default class SRPlugin extends Plugin {
         return true;
     }
 
+    noteIsNew(note: TFile): boolean {
+        const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
+        const frontmatter: FrontMatterCache | Record<string, unknown> =
+            fileCachedData.frontmatter || {};
+        return !(
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-due") &&
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-interval") &&
+            Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
+        );
+    }
     async saveReviewResponse_onNote(note: TFile, response: ReviewResponse, ease: number) {
         const fileCachedData = this.app.metadataCache.getFileCache(note) || {};
         const frontmatter: FrontMatterCache | Record<string, unknown> =
@@ -639,7 +658,7 @@ export default class SRPlugin extends Plugin {
                 Object.prototype.hasOwnProperty.call(frontmatter, "sr-ease")
             )
         ) {
-            // ease = this.linkRank.getContribution(note, this.easeByPath).ease;
+            ease = this.linkRank.getContribution(note, this.easeByPath).ease;
             ease = Math.round(ease);
             interval = 1.0;
             delayBeforeReview = 0;
@@ -704,7 +723,7 @@ export default class SRPlugin extends Plugin {
         return { sNote: snote, buryList };
     }
 
-    private postponeResponse(note: TFile, sNote: SchedNote) {
+    postponeResponse(note: TFile, sNote: SchedNote) {
         Object.values(this.reviewDecks).forEach((reviewDeck: ReviewDeck) => {
             let wasDueInDeck = false;
             reviewDeck.scheduledNotes.findIndex((newNote, ind) => {
@@ -753,7 +772,7 @@ export default class SRPlugin extends Plugin {
         } else if (this.data.settings.reviewingNoteDirectly) {
             const rdname =
                 this.lastSelectedReviewDeck ??
-                ReviewNote.getDeckNameForReviewDirectly(this.reviewDecks) ??
+                IReviewNote.getDeckNameForReviewDirectly(this.reviewDecks) ??
                 reviewDeckNames[0];
             this.reviewNextNote(rdname);
         } else {
@@ -777,7 +796,7 @@ export default class SRPlugin extends Plugin {
         let index = -1;
 
         const isPreviewUndueNote = (item: RepetitionItem) => {
-            return item.nextReview > Date.now() && !Queue.getInstance().isInLaterQueue(item.ID);
+            return item.nextReview > Date.now() && !item.isDue;
         };
         const fShowItemInfo = (item: RepetitionItem, msg: string) => {
             if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
@@ -802,7 +821,7 @@ export default class SRPlugin extends Plugin {
             }
         };
 
-        index = ReviewNote.getNextDueNoteIndex(
+        index = IReviewNote.getNextDueNoteIndex(
             deck.dueNotesCount,
             this.data.settings.openRandomNote,
         );
@@ -850,14 +869,14 @@ export default class SRPlugin extends Plugin {
             this.data.settings.reviewingNoteDirectly &&
             this.noteStats.onDueCount + this.noteStats.newCount > 0
         ) {
-            const rdname: string = ReviewNote.getDeckNameForReviewDirectly(this.reviewDecks);
+            const rdname: string = IReviewNote.getDeckNameForReviewDirectly(this.reviewDecks);
             if (rdname != undefined) {
                 this.reviewNextNote(rdname);
                 return;
             }
         }
 
-        ReviewNote.nextReviewNotice(Queue.getInstance().laterSize);
+        ReviewView.nextReviewNotice(IReviewNote.minNextView, Queue.getInstance().laterSize);
 
         this.reviewFloatBar.selfDestruct();
         this.reviewQueueView.redraw();
@@ -943,17 +962,5 @@ export default class SRPlugin extends Plugin {
                 ),
             }),
         );
-    }
-
-    getLinkedEase(note: TFile) {
-        const settings = this.data.settings;
-        if (
-            settings.algorithm === algorithmNames.Anki ||
-            settings.algorithm === algorithmNames.Default ||
-            settings.algorithm === algorithmNames.SM2
-        ) {
-            const ease = this.linkRank.getContribution(note, this.easeByPath).ease;
-            return ease;
-        }
     }
 }

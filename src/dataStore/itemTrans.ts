@@ -1,7 +1,7 @@
 import { TFile } from "obsidian";
 import { CardScheduleInfo, NoteCardScheduleParser } from "src/CardSchedule";
 import { Note } from "src/Note";
-import { ReviewDeck } from "src/ReviewDeck";
+import { ReviewDeck, SchedNote } from "src/ReviewDeck";
 import { SrTFile } from "src/SRFile";
 import { TopicPath } from "src/TopicPath";
 import { DataStore } from "src/dataStore/data";
@@ -9,17 +9,17 @@ import { BlockUtils, debug, logExecutionTime } from "src/util/utils_recall";
 import { CardInfo } from "./trackedFile";
 import { Card } from "src/Card";
 import { DataLocation } from "./dataLocation";
-import { RPITEMTYPE } from "./repetitionItem";
+import { RPITEMTYPE, RepetitionItem } from "./repetitionItem";
 import { Tags } from "src/tags";
 import { SRSettings } from "src/settings";
 import { INoteEaseList } from "src/NoteEaseList";
 import { algorithmNames } from "src/algorithms/algorithms";
 
-export class ItemToDecks {
+export class ItemTrans {
     settings: SRSettings;
 
     static create(settings: SRSettings) {
-        return new ItemToDecks(settings);
+        return new ItemTrans(settings);
     }
     constructor(settings: SRSettings) {
         this.settings = settings;
@@ -39,7 +39,6 @@ export class ItemToDecks {
         const store = DataStore.getInstance();
         const settings = this.settings;
         // store.data.queues.buildQueue();
-        const now = new Date().getTime();
         notes.forEach(async (note) => {
             let deckname = Tags.getNoteDeckName(note, this.settings);
             if (deckname == null) {
@@ -74,27 +73,8 @@ export class ItemToDecks {
                         }
                     }
                 }
-                ItemToDecks.toRevDeck(reviewDecks[deckname], note);
+                ItemTrans._toRevDeck(reviewDecks[deckname], note);
             }
-
-            // Add Recall reviewnote deck
-            // const dkname = DEFAULT_DECKNAME;
-            // if (!Object.prototype.hasOwnProperty.call(reviewDecks, dkname)) {
-            //     reviewDecks[dkname] = new ReviewDeck(dkname);
-            // }
-
-            // store.data.trackedFiles
-            //     .filter((trackedFile) => trackedFile?.noteID >= 0 && trackedFile.isTracked)
-            //     .filter((trackedFile) => trackedFile.isDefault)
-            //     .filter((trackedFile) => {
-            //         // only add default deck.
-            //         const note = app.vault.getAbstractFileByPath(trackedFile.path) as TFile;
-            //         if (note instanceof TFile) {
-            //             noteStats.updateStats(store.getItembyID(trackedFile.noteID));
-            //             DataSyncer.syncRCDataToSRrevDeck(reviewDecks[deckName], note);
-            //             return true;
-            //         }
-            // });
         });
         return;
     }
@@ -105,11 +85,9 @@ export class ItemToDecks {
      * @param rdeck
      * @returns
      */
-    static toRevDeck(rdeck: ReviewDeck, note: TFile, now?: number) {
+    private static _toRevDeck(rdeck: ReviewDeck, note: TFile, now?: number) {
         // const plugin = plugin;
-        // const rdeck = reviewDecks[deckName];
         const store = DataStore.getInstance();
-        // const queue = store.data.queues;
         const ind = store.getFileIndex(note.path);
         const trackedFile = store.getTrackedFile(note.path);
         const item = store.getNoteItem(note.path);
@@ -125,13 +103,7 @@ export class ItemToDecks {
         }
 
         if (item.hasDue) {
-            rdeck.scheduledNotes.push({
-                note,
-                item,
-                dueUnix: item.nextReview,
-                interval: item.interval,
-                ease: item.ease,
-            });
+            rdeck.scheduledNotes.push(itemToShedNote(item, note));
         } else {
             rdeck.newNotes.push({ note, item });
         }
@@ -146,7 +118,10 @@ export class ItemToDecks {
         const store = DataStore.getInstance();
         const settings = store.settings;
         const noteFile: SrTFile = note.file as SrTFile;
-        if (topicPath.isEmptyPath || settings.dataLocation === DataLocation.SaveOnNoteFile) {
+        if (
+            note.questionList.length === 0 ||
+            settings.dataLocation === DataLocation.SaveOnNoteFile
+        ) {
             return;
         }
         if (store.getFileIndex(note.filePath) < 0) {
@@ -207,4 +182,14 @@ function updateCardObjs(cards: Card[], cardinfo: CardInfo, scheduling: RegExpMat
             hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule : null;
         cardObj.Id = carditemIds[i];
     }
+}
+
+export function itemToShedNote(item: RepetitionItem, note: TFile): SchedNote {
+    return {
+        note,
+        item,
+        dueUnix: item.nextReview,
+        interval: item.interval,
+        ease: item.ease,
+    };
 }
