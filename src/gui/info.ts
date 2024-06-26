@@ -83,8 +83,15 @@ export class ItemInfoModal extends Modal {
         items.forEach((item) => {
             const divdetails = details.createEl("details");
             const divsummary = divdetails.createEl("summary");
-            const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
-            divsummary.setText(`ID: ${item.ID} \t nextReivew: ${dt}`);
+            let cardmsg = "";
+            if (item.hasDue) {
+                const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
+                cardmsg = `nextReivew: ${dt}`;
+            } else {
+                cardmsg = "NewCard";
+            }
+
+            divsummary.setText(`ID: ${item.ID} \t ${cardmsg}`);
             const div = divdetails.createDiv();
             this.displayitem(div, item);
         });
