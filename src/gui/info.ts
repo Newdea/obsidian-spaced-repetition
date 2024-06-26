@@ -24,7 +24,7 @@ export class ItemInfoModal extends Modal {
         this.settings = plugin.data.settings;
         this.file = file;
         if (item == null) {
-            this.item = this.store.getItemsOfFile(this.file.path)[0];
+            this.item = this.store.getNoteItem(file.path);
         } else {
             this.item = item;
         }
@@ -33,24 +33,23 @@ export class ItemInfoModal extends Modal {
     onOpen() {
         const { contentEl } = this;
         //TODO: Implement Item info.
-        // const item = this.store.getItemsOfFile(this.file.path)[0];
         const path = this.file.path;
         // contentEl.createEl("p").setText("Item info of " + this.file.path);
         const buttonDivAll = contentEl.createDiv("srs-flex-row");
         const contentdiv = contentEl.createEl("div");
+        contentdiv.setAttr("style", "min-height: 200px");
 
         const tkfile = this.store.getTrackedFile(path);
-        const noteItem = this.store.getNoteItem(path);
         if (tkfile.hasCards) {
-            new ButtonComponent(buttonDivAll).setButtonText("Note").onClick(() => {
-                this.displayitem(contentdiv, noteItem);
+            new ButtonComponent(buttonDivAll).setButtonText(this.item.itemType).onClick(() => {
+                this.displayitem(contentdiv, this.item);
             });
             new ButtonComponent(buttonDivAll).setButtonText("Cards in this Note").onClick(() => {
                 this.displayAllitems(contentdiv, tkfile);
                 // this.close();
             });
         }
-        this.displayitem(contentdiv, noteItem);
+        this.displayitem(contentdiv, this.item);
 
         const buttonDiv = contentEl.createDiv("srs-flex-row");
 
