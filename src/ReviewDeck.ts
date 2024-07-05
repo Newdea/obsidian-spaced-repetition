@@ -28,10 +28,13 @@ export class ReviewDeck {
 
     public sortNotes(pageranks: Record<string, number>): void {
         // sort new notes by importance
-        this.newNotes = this.newNotes.sort(
-            (a: SchedNote, b: SchedNote) =>
-                (pageranks[b.note.path] || 0) - (pageranks[a.note.path] || 0),
-        );
+        this.newNotes = this.newNotes.sort((a: SchedNote, b: SchedNote) => {
+            const result = (pageranks[b.note.path] || 0) - (pageranks[a.note.path] || 0);
+            if (result != 0) {
+                return result;
+            }
+            return a.note.stat.ctime - b.note.stat.ctime;
+        });
 
         // sort scheduled notes by date & within those days, sort them by importance
         this.scheduledNotes = this.scheduledNotes.sort((a: SchedNote, b: SchedNote) => {
