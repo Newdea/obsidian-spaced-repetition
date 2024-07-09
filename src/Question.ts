@@ -94,6 +94,7 @@ export class QuestionText {
     //      Block identifiers can only consist of letters, numbers, and dashes.
     // If present, then first character is "^"
     obsidianBlockId: string;
+    genBlockId?: string;
 
     // Hash of string  (topicPath + actualQuestion)
     // Explicitly excludes the HTML comment with the scheduling info
@@ -235,10 +236,14 @@ export class Question {
 
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatTopicAndQuestion();
+        let blockId: string = this.questionText.obsidianBlockId;
         if (settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            if (settings.cardBlockID && !blockId) {
+                blockId = this.questionText.obsidianBlockId = this.questionText.genBlockId;
+            }
+            if (blockId) result += ` ${blockId}`;
             return result;
         }
-        const blockId: string = this.questionText.obsidianBlockId;
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
