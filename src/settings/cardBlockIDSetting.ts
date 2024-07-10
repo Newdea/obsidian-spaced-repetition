@@ -6,13 +6,13 @@ import SRPlugin from "src/main";
 export function addcardBlockIDSetting(containerEl: HTMLElement, plugin: SRPlugin) {
     const desc = createFragment((frag) => {
         frag.createDiv().innerHTML =
-            "use Card Block ID instead of line number and text hash.<br>  <b>If set True, can't reset to False again.</b>";
+            "use Card Block ID instead of line number and text hash.<br>  <b>If set True, block id will keep in note after reset to False again.</b>";
     });
     const mesg =
         "\
-    **!!! If set True, can't reset to False again.**\n\
-    **!!! If set True, can't reset to False again.**\n\
-    **!!! If set True, can't reset to False again.**\n\
+    **!!! If set True, block id will keep in note after reset to False again.**\n\
+    **!!! If set True, block id will keep in note after reset to False again.**\n\
+    **!!! If set True, block id will keep in note after reset to False again.**\n\
     ";
     let confirmP: Promise<boolean>;
     new Setting(containerEl)
@@ -21,10 +21,10 @@ export function addcardBlockIDSetting(containerEl: HTMLElement, plugin: SRPlugin
         .addToggle((toggle) => {
             const value = plugin.data.settings.cardBlockID;
             toggle.setValue(value);
-            if (value) {
-                toggle.setDisabled(true);
-                return;
-            }
+            // if (value) {
+            //     toggle.setDisabled(true);
+            //     return;
+            // }
             toggle.onChange(async (newValue) => {
                 if (newValue) {
                     confirmP = new Promise(function (resolve) {
@@ -35,15 +35,17 @@ export function addcardBlockIDSetting(containerEl: HTMLElement, plugin: SRPlugin
                                 resolve(true);
                             } else {
                                 toggle.setValue(false);
+                                plugin.data.settings.cardBlockID = newValue;
+                                await plugin.savePluginData();
                                 resolve(false);
                             }
                         }).open();
                     });
-                    if (await confirmP) {
-                        toggle.setDisabled(true);
-                    } else {
-                        toggle.setValue(false);
-                    }
+                    // if (await confirmP) {
+                    //     toggle.setDisabled(true);
+                    // } else {
+                    //     toggle.setValue(false);
+                    // }
                 }
             });
         });
