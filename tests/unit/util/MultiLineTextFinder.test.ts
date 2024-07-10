@@ -112,17 +112,45 @@ describe("find", () => {
 
 describe("findAndReplace", () => {
     test("Multi line search string present as exact match", () => {
-        let searchStr: string = `Some Stuff 4 More Stuff
-Some Stuff 5 More Stuff
-Some Stuff 6 More Stuff`;
+        let postText: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Replacement line
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff    `;
+        let searchStr: string = `Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff    `;
 
-        let replacementStr: string = `Replacement line`;
+        let replacementStr: string = `Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff ^123456`;
 
         let expectedResult: string = `Some Stuff 0 More Stuff
 Some Stuff 1 More Stuff
 Some Stuff 2 More Stuff
 Some Stuff 3 More Stuff
 Replacement line
+Some Stuff 7 More Stuff
+Some Stuff 8 More Stuff
+Some Stuff 9 More Stuff ^123456`;
+        checkFindAndReplaceResult(postText, searchStr, replacementStr, expectedResult);
+    });
+
+    test("line search string has pre/post spaces for block id", () => {
+        let searchStr: string = `Some Stuff 4 More Stuff
+${space}Some Stuff 5 More Stuff
+Some Stuff 6 More Stuff${space}${space}`;
+
+        let replacementStr: string = `Replacement line 1
+Replacement line 2`;
+
+        let expectedResult: string = `Some Stuff 0 More Stuff
+Some Stuff 1 More Stuff
+Some Stuff 2 More Stuff
+Some Stuff 3 More Stuff
+Replacement line 1
+Replacement line 2
 Some Stuff 7 More Stuff
 Some Stuff 8 More Stuff
 Some Stuff 9 More Stuff`;

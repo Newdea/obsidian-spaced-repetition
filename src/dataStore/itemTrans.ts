@@ -141,9 +141,12 @@ export class ItemTrans {
             const cardText: string = question.questionText.actualQuestion;
             const lineNo: number = question.lineNo;
             const cardTextHash = BlockUtils.getTxtHash(cardText);
-            const blockID = question.questionText.obsidianBlockId;
+            let blockID = question.questionText.obsidianBlockId;
             const count: number = question.cards.length;
             const scheduling: RegExpMatchArray[] = [];
+            if (settings.cardBlockID && !blockID) {
+                blockID = question.questionText.genBlockId = "^" + BlockUtils.generateBlockId();
+            }
             let cardinfo = trackedFile.getSyncCardInfo(lineNo, cardTextHash, blockID);
             if (cardinfo != null) {
                 cardinfo.itemIds
@@ -166,7 +169,11 @@ export class ItemTrans {
             updateCardObjs(question.cards, cardinfo, scheduling);
 
             // update question
-            question.hasChanged = false;
+            if (question.questionText.genBlockId) {
+                question.hasChanged = true;
+            } else {
+                question.hasChanged = false;
+            }
         }
     }
 }

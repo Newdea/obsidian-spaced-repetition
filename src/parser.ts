@@ -72,12 +72,12 @@ export function parseEx(
         }
 
         if (cardText.length > 0) {
-            cardText += "\n";
+            cardText = cardText.trimEnd() + "\n";
         } else if (cardText.length === 0) {
             // This could be the first line of a multi line question
             firstLineNo = i;
         }
-        cardText += currentLine.trimEnd();
+        cardText += currentLine;
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||
