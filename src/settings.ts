@@ -196,7 +196,7 @@ export class SRSettingTab extends PluginSettingTab {
 
     display(): void {
         const { containerEl } = this;
-
+        const settings = this.plugin.data.settings;
         containerEl.empty();
 
         const header = containerEl.createEl("h1", { text: `${t("SETTINGS_HEADER")}` });
@@ -287,7 +287,11 @@ export class SRSettingTab extends PluginSettingTab {
             );
         addburySiblingSetting(containerEl, this.plugin);
         addMultiClozeSetting(containerEl, this.plugin);
-        addcardBlockIDSetting(containerEl, this.plugin);
+        if (settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            addcardBlockIDSetting(containerEl, this.plugin);
+        } else {
+            settings.cardBlockID = false;
+        }
         new Setting(containerEl)
             .setName(t("SHOW_CARD_CONTEXT"))
             .setDesc(t("SHOW_CARD_CONTEXT_DESC"))
