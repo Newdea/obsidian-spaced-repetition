@@ -80,6 +80,7 @@ export class ItemInfoModal extends Modal {
         const summary = details.createEl("summary");
 
         summary.setText(text);
+        summary.addClass("tree-item");
         items.forEach((item) => {
             const divdetails = details.createEl("details");
             const divsummary = divdetails.createEl("summary");
@@ -92,7 +93,9 @@ export class ItemInfoModal extends Modal {
             }
 
             divsummary.setText(`ID: ${item.ID} \t ${cardmsg}`);
+            divsummary.addClass("tree-item-children");
             const div = divdetails.createDiv();
+            div.addClass("tree-item-children");
             this.displayitem(div, item);
         });
     }
