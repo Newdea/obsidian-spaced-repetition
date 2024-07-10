@@ -6,14 +6,13 @@ import SRPlugin from "src/main";
 export function addcardBlockIDSetting(containerEl: HTMLElement, plugin: SRPlugin) {
     const desc = createFragment((frag) => {
         frag.createDiv().innerHTML =
-            "use Card Block ID instead of line number and text hash.<br>  <b>If set True, block id will keep in note after reset to False again.</b>";
+            "use Card Block ID instead of line number and text hash.<br>  <b>If set True, block id will append after card text. And block id will keep in note after reset to False again.</b>";
     });
-    const mesg =
-        "\
-    **!!! If set True, block id will keep in note after reset to False again.**\n\
-    **!!! If set True, block id will keep in note after reset to False again.**\n\
-    **!!! If set True, block id will keep in note after reset to False again.**\n\
-    ";
+    const mesg = `**If set True, block id will append after card text. And block id will keep in note after reset to False again. ** \n
+Suggestion： backup your vault before set True. Or try it in sandbox vault. \n
+设置打开后，就会在所有卡片后添加blockid, 就算再关闭添加的blockid也依然保留在笔记中，不会被删除。\n
+建议 ** 先备份 ** 笔记库，或在沙盒库中试用。
+    `;
     let confirmP: Promise<boolean>;
     new Setting(containerEl)
         .setName("Card Block ID")
