@@ -36,20 +36,27 @@ export class ItemInfoModal extends Modal {
         const path = this.file.path;
         // contentEl.createEl("p").setText("Item info of " + this.file.path);
         const buttonDivAll = contentEl.createDiv("srs-flex-row");
+        buttonDivAll.setAttr("style", "position: sticky;top: 0");
         const contentdiv = contentEl.createEl("div");
         contentdiv.setAttr("style", "min-height: 200px");
 
         const tkfile = this.store.getTrackedFile(path);
         if (tkfile.hasCards) {
-            new ButtonComponent(buttonDivAll).setButtonText(this.item.itemType).onClick(() => {
-                this.displayitem(contentdiv, this.item);
-            });
+            if (this.item) {
+                new ButtonComponent(buttonDivAll).setButtonText(this.item.itemType).onClick(() => {
+                    this.displayitem(contentdiv, this.item);
+                });
+            }
             new ButtonComponent(buttonDivAll).setButtonText("Cards in this Note").onClick(() => {
                 this.displayAllitems(contentdiv, tkfile);
                 // this.close();
             });
         }
-        this.displayitem(contentdiv, this.item);
+        if (this.item) {
+            this.displayitem(contentdiv, this.item);
+        } else {
+            this.displayAllitems(contentdiv, tkfile);
+        }
 
         const buttonDiv = contentEl.createDiv("srs-flex-row");
 
@@ -79,6 +86,7 @@ export class ItemInfoModal extends Modal {
         const details = contentEl.createEl("details");
         const summary = details.createEl("summary");
 
+        details.open = true;
         summary.setText(text);
         summary.addClass("tree-item");
         items.forEach((item) => {
