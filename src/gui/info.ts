@@ -28,6 +28,7 @@ export class ItemInfoModal extends Modal {
         } else {
             this.item = item;
         }
+        this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
     }
 
     onOpen() {
@@ -38,7 +39,6 @@ export class ItemInfoModal extends Modal {
         const buttonDivAll = contentEl.createDiv("srs-flex-row");
         buttonDivAll.setAttr("style", "position: sticky;top: 0");
         const contentdiv = contentEl.createEl("div");
-        contentdiv.setAttr("style", "min-height: 200px");
 
         const tkfile = this.store.getTrackedFile(path);
         if (tkfile.hasCards) {
@@ -59,6 +59,7 @@ export class ItemInfoModal extends Modal {
         }
 
         const buttonDiv = contentEl.createDiv("srs-flex-row");
+        buttonDiv.setAttr("style", "position: sticky;bottom: 0;margin-top: auto;");
 
         new ButtonComponent(buttonDiv)
             .setButtonText("Save")
