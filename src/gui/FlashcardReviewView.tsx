@@ -381,16 +381,6 @@ export class FlashcardReviewView {
         const opt = algo.srsOptions()[response];
         const store = this.plugin.store;
         const id = this._currentCard.Id;
-        let blockID = this._currentQuestion.questionText.obsidianBlockId;
-        if (this.settings.cardBlockID && !blockID) {
-            const cardText: string = this._currentQuestion.questionText.actualQuestion;
-            const lineNo: number = this._currentQuestion.lineNo;
-            const cardTextHash = BlockUtils.getTxtHash(cardText);
-            const tkfile = store.getFileByIndex(store.getItembyID(id).fileIndex);
-            blockID = this._currentQuestion.questionText.genBlockId =
-                "^" + BlockUtils.generateBlockId();
-            tkfile.getSyncCardInfo(lineNo, cardTextHash, blockID);
-        }
         store.updateReviewedCounts(id, RPITEMTYPE.CARD);
         store.reviewId(id, opt);
         store.save();

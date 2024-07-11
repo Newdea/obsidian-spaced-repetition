@@ -116,7 +116,7 @@ export class TrackedFile implements ITrackedFile {
      * @returns {CardInfo} cardinfo | null: didn't have cardInfo
      */
     getSyncCardInfo(lineNo: number, cardTextHash?: string, blockID?: string): CardInfo {
-        const cardinfo = this.getCardInfo(lineNo, cardTextHash);
+        const cardinfo = this.getCardInfo(lineNo, cardTextHash, blockID);
         if (cardinfo !== null) {
             if (cardinfo.lineNo !== lineNo) {
                 cardinfo.lineNo = lineNo;
