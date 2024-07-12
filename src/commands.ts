@@ -87,6 +87,95 @@ export default class Commands {
             },
         });
 
+        plugin.addCommand({
+            id: "reschedule",
+            name: "Reschedule",
+            callback: () => {
+                reschedule(plugin.store.items.filter((item) => item.hasDue && item.isTracked));
+            },
+        });
+
+        plugin.addCommand({
+            id: "postpone-cards",
+            name: "Postpone cards",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => item.isCard && item.isTracked));
+            },
+        });
+        plugin.addCommand({
+            id: "postpone-notes",
+            name: "Postpone notes",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => !item.isCard && item.isTracked));
+            },
+        });
+        plugin.addCommand({
+            id: "postpone-all",
+            name: "Postpone All",
+            callback: () => {
+                postponeItems(plugin.store.items.filter((item) => item.isTracked));
+            },
+        });
+
+        plugin.addCommand({
+            id: "postpone-note-manual",
+            name: "Postpone this note after x days",
+            checkCallback: (checking: boolean) => {
+                const file = plugin.app.workspace.getActiveFile();
+                const settings = plugin.data.settings;
+                if (file != null) {
+                    if (plugin.store.getTrackedFile(file.path)?.isTrackedNote) {
+                        if (!checking) {
+                            const tkfile = plugin.store.getTrackedFile(file.path);
+                            const input = new GetInputModal(
+                                plugin.app,
+                                "please input positive number",
+                            );
+                            input.submitCallback = async (days: number) => {
+                                postponeItems([plugin.store.getItembyID(tkfile.noteID)], days);
+                                plugin.store.save();
+                                new Notice(`This note has been postponed ${days} days`);
+                                await plugin.sync();
+                                if (settings.autoNextNote && plugin.lastSelectedReviewDeck) {
+                                    plugin.reviewNextNote(plugin.lastSelectedReviewDeck);
+                                }
+                            };
+                            input.open();
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
+        });
+
+        plugin.addCommand({
+            id: "postpone-cards-manual",
+            name: "Postpone cards in this note after x days",
+            checkCallback: (checking: boolean) => {
+                const file = plugin.app.workspace.getActiveFile();
+                if (file != null) {
+                    if (plugin.store.getTrackedFile(file.path)?.isTracked) {
+                        if (!checking) {
+                            const tkfile = plugin.store.getTrackedFile(file.path);
+                            const input = new GetInputModal(
+                                plugin.app,
+                                "please input positive number",
+                            );
+                            input.submitCallback = (days: number) =>
+                                postponeItems(tkfile.cardIDs.map(plugin.store.getItembyID), days);
+                            input.open();
+
+                            // plugin.store.save();
+                            plugin.sync();
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
+        });
+
         // plugin.addCommand({
         //     id: "update-file",
         //     name: "Update Note",
@@ -208,95 +297,6 @@ export default class Commands {
             name: "Update Items",
             callback: () => {
                 plugin.store.verifyItems();
-            },
-        });
-
-        plugin.addCommand({
-            id: "reschedule",
-            name: "Reschedule",
-            callback: () => {
-                reschedule(plugin.store.items.filter((item) => item.hasDue && item.isTracked));
-            },
-        });
-
-        plugin.addCommand({
-            id: "postpone-cards",
-            name: "Postpone cards",
-            callback: () => {
-                postponeItems(plugin.store.items.filter((item) => item.isCard && item.isTracked));
-            },
-        });
-        plugin.addCommand({
-            id: "postpone-notes",
-            name: "Postpone notes",
-            callback: () => {
-                postponeItems(plugin.store.items.filter((item) => !item.isCard && item.isTracked));
-            },
-        });
-        plugin.addCommand({
-            id: "postpone-all",
-            name: "Postpone All",
-            callback: () => {
-                postponeItems(plugin.store.items.filter((item) => item.isTracked));
-            },
-        });
-
-        plugin.addCommand({
-            id: "postpone-note-manual",
-            name: "Postpone this note after x days",
-            checkCallback: (checking: boolean) => {
-                const file = plugin.app.workspace.getActiveFile();
-                const settings = plugin.data.settings;
-                if (file != null) {
-                    if (plugin.store.getTrackedFile(file.path)?.isTrackedNote) {
-                        if (!checking) {
-                            const tkfile = plugin.store.getTrackedFile(file.path);
-                            const input = new GetInputModal(
-                                plugin.app,
-                                "please input positive number",
-                            );
-                            input.submitCallback = async (days: number) => {
-                                postponeItems([plugin.store.getItembyID(tkfile.noteID)], days);
-                                plugin.store.save();
-                                new Notice(`This note has been postponed ${days} days`);
-                                await plugin.sync();
-                                if (settings.autoNextNote && plugin.lastSelectedReviewDeck) {
-                                    plugin.reviewNextNote(plugin.lastSelectedReviewDeck);
-                                }
-                            };
-                            input.open();
-                        }
-                        return true;
-                    }
-                }
-                return false;
-            },
-        });
-
-        plugin.addCommand({
-            id: "postpone-cards-manual",
-            name: "Postpone cards in this note after x days",
-            checkCallback: (checking: boolean) => {
-                const file = plugin.app.workspace.getActiveFile();
-                if (file != null) {
-                    if (plugin.store.getTrackedFile(file.path)?.isTracked) {
-                        if (!checking) {
-                            const tkfile = plugin.store.getTrackedFile(file.path);
-                            const input = new GetInputModal(
-                                plugin.app,
-                                "please input positive number",
-                            );
-                            input.submitCallback = (days: number) =>
-                                postponeItems(tkfile.cardIDs.map(plugin.store.getItembyID), days);
-                            input.open();
-
-                            // plugin.store.save();
-                            plugin.sync();
-                        }
-                        return true;
-                    }
-                }
-                return false;
             },
         });
     }
