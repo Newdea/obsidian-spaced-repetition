@@ -7,7 +7,7 @@ export class MultiLineTextFinder {
         replacementText: string,
     ): string | null {
         let result: string = null;
-        if (sourceText.includes(searchText)) {
+        if (sourceText.includes(searchText.trimEnd())) {
             result = literalStringReplace(sourceText, searchText, replacementText);
         } else {
             const sourceTextArray = splitTextIntoLineArray(sourceText);

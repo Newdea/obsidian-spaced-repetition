@@ -241,7 +241,11 @@ export class Question {
             if (settings.cardBlockID && !blockId) {
                 blockId = this.questionText.obsidianBlockId = this.questionText.genBlockId;
             }
-            if (blockId) result += ` ${blockId}`;
+            if (blockId) {
+                this.questionText.original += "\n";
+                result += ` ${blockId}\n`;
+            }
+
             return result;
         }
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
@@ -263,13 +267,12 @@ export class Question {
     }
 
     updateQuestionText(noteText: string, settings: SRSettings): string {
-        const originalText: string = this.questionText.original;
-
         // Get the entire text for the question including:
         //      1. the topic path (if present),
         //      2. the question text
         //      3. the schedule HTML comment (if present)
         const replacementText = this.formatForNote(settings);
+        const originalText: string = this.questionText.original;
 
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {
