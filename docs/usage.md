@@ -92,7 +92,7 @@ Via command line, `SR view statistics`
 
 #### View review information
 
-Via command line, `SR Item Info`, you can view review information for current note/all cards in current note.
+Via command line, `SR Item Info`, you can view review information for current note/all cards in current note. And can modify next review date/time.
 
 #### Algorithms
 

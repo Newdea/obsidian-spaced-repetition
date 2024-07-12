@@ -1,5 +1,5 @@
 本插件是魔改自[obsidian-spaced-repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) 和 [recall plugin](https://github.com/martin-jw/obsidian-recall)
-就是 SR 的复习时间信息可以单独保存，不修改原笔记文件内容，以及添加其他功能。
+就是 SR 的复习时间信息可以单独保存，~~不修改原笔记文件内容~~(如果卡片复习，开启blockid设置，会在卡片文本后追加BlockID)，以及添加其他功能。
 
 ## Features
 
@@ -18,7 +18,8 @@
 10. 重排所有已排程的复习项；
 11. 支持多个挖空；
 12. 设置项 隐藏关联卡片拆分为 隐藏关联卡片（即原来的）和复习笔记时隐藏关联卡片；另，多个挖空不会被隐藏关联卡片；
-13. 其他待发现的小改动；
+13. 设置项： 卡片定位使用BlockID，会在卡片文本后追加BlockID (e.g. `^blkid1`)，**即修改了原笔记文件**。默认关闭，但卡片定位可能不太准确，够用；
+14. 其他待发现的小改动；
 
 **注意**
 没有使用过 obsidian-spaced-repetition 插件的可以直接用，正在使用 obsidian-spaced-repetition 插件的话，建议试用前先备份 :yum:

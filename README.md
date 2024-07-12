@@ -1,6 +1,6 @@
 This is a modified version of [obsidian-spaced-repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) and merging [recall plugin](https://github.com/martin-jw/obsidian-recall) to use seperate json data file, and add some interesting features.
 
-就是 SR 的时间排程信息可以单独保存，不修改原笔记文件内容，以及添加其他功能。
+就是 SR 的时间排程信息可以单独保存，~~不修改原笔记文件内容~~(如果卡片复习，开启blockid设置，会在卡片文本后追加BlockID)，以及添加其他功能。
 
 # Flashcard-Based and Note-Based Spaced Repetition Plugin
 
@@ -25,6 +25,7 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 -   reschedule all scheduled items;
 -   support multi-clozes;
 -   setting `burySiblingCards` split into `burySiblingCards`(origin) and `burySiblingCardsByNoteReview`, and multi-clozes will not be buried;
+-   Setting: Card index uses BlockID, which appends BlockID (e.g. `^blkid1`) to the card text, **will modify the original notes file**. Off by default, but card index may not be accurate enough;
 
 ## Maintainers Wanted
 
