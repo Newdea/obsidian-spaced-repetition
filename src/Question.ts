@@ -243,7 +243,8 @@ export class Question {
             }
             if (blockId) {
                 this.questionText.original += "\n";
-                result += ` ${blockId}\n`;
+                if (this.isCardCommentsOnSameLine(settings)) result += ` ${blockId}\n`;
+                else result += `\n${blockId}\n`;
             }
 
             return result;
