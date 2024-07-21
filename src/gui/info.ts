@@ -14,7 +14,7 @@ export class ItemInfoModal extends Modal {
     settings: SRSettings;
     file: TFile;
     item: RepetitionItem;
-    nextReview: number;
+    mnextReview: Map<number, number> = new Map();
     lastInterval: number;
 
     constructor(plugin: SRPlugin, file: TFile, item: RepetitionItem = null) {
@@ -28,6 +28,7 @@ export class ItemInfoModal extends Modal {
         } else {
             this.item = item;
         }
+        this.modalEl.style.height = this.settings.flashcardHeightPercentage + "%";
     }
 
     onOpen() {
@@ -36,22 +37,29 @@ export class ItemInfoModal extends Modal {
         const path = this.file.path;
         // contentEl.createEl("p").setText("Item info of " + this.file.path);
         const buttonDivAll = contentEl.createDiv("srs-flex-row");
+        buttonDivAll.setAttr("style", "position: sticky;top: 0");
         const contentdiv = contentEl.createEl("div");
-        contentdiv.setAttr("style", "min-height: 200px");
 
         const tkfile = this.store.getTrackedFile(path);
         if (tkfile.hasCards) {
-            new ButtonComponent(buttonDivAll).setButtonText(this.item.itemType).onClick(() => {
-                this.displayitem(contentdiv, this.item);
-            });
+            if (this.item) {
+                new ButtonComponent(buttonDivAll).setButtonText(this.item.itemType).onClick(() => {
+                    this.displayitem(contentdiv, this.item);
+                });
+            }
             new ButtonComponent(buttonDivAll).setButtonText("Cards in this Note").onClick(() => {
                 this.displayAllitems(contentdiv, tkfile);
                 // this.close();
             });
         }
-        this.displayitem(contentdiv, this.item);
+        if (this.item) {
+            this.displayitem(contentdiv, this.item);
+        } else {
+            this.displayAllitems(contentdiv, tkfile);
+        }
 
         const buttonDiv = contentEl.createDiv("srs-flex-row");
+        buttonDiv.setAttr("style", "position: sticky;bottom: 0;margin-top: auto;");
 
         new ButtonComponent(buttonDiv)
             .setButtonText("Save")
@@ -79,13 +87,24 @@ export class ItemInfoModal extends Modal {
         const details = contentEl.createEl("details");
         const summary = details.createEl("summary");
 
+        details.open = true;
         summary.setText(text);
+        summary.addClass("tree-item");
         items.forEach((item) => {
             const divdetails = details.createEl("details");
             const divsummary = divdetails.createEl("summary");
-            const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
-            divsummary.setText(`ID: ${item.ID} \t nextReivew: ${dt}`);
+            let cardmsg = "";
+            if (item.hasDue) {
+                const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
+                cardmsg = `nextReivew: ${dt}`;
+            } else {
+                cardmsg = "NewCard";
+            }
+
+            divsummary.setText(`ID: ${item.ID} \t ${cardmsg}`);
+            divsummary.addClass("tree-item-children");
             const div = divdetails.createDiv();
+            div.addClass("tree-item-children");
             this.displayitem(div, item);
         });
     }
@@ -109,11 +128,10 @@ export class ItemInfoModal extends Modal {
             if (key != "data") {
                 if (key === "nextReview") {
                     new Setting(contentdiv).setDesc(key).addText((text) => {
-                        this.nextReview = undefined;
                         const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
                         text.setValue(dt).onChange((value) => {
                             const nr = window.moment(value).valueOf();
-                            this.nextReview = nr ?? 0;
+                            this.mnextReview.set(item.ID, nr ?? 0);
                         });
                     });
                 } else {
@@ -149,14 +167,21 @@ export class ItemInfoModal extends Modal {
         const item = this.item;
         console.debug(this);
         const algo = this.settings.algorithm;
-        if (this.nextReview) {
-            const nr = window.moment(this.nextReview).valueOf();
-            this.nextReview = nr ?? 0;
-            item.nextReview = this.nextReview > 0 ? this.nextReview : item.nextReview;
-            if (algo === algorithmNames.Fsrs) {
-                const data = item.data as FsrsData;
-                data.due = new Date(item.nextReview);
-            }
+        if (this.mnextReview.size > 0) {
+            this.mnextReview.forEach((v, id) => {
+                const item = this.store.getItembyID(id);
+                console.log(
+                    `update item priority from ${item.nextReview} to ${v}, current item info:`,
+                    item,
+                );
+                const nr = window.moment(v).valueOf() ?? 0;
+                item.nextReview = nr > 0 ? nr : item.nextReview;
+
+                if (algo === algorithmNames.Fsrs) {
+                    const data = item.data as FsrsData;
+                    data.due = new Date(item.nextReview);
+                }
+            });
         }
         // item.nextReview= this.nextReview?this.nextReview:item.nextReview;
         if (algo !== algorithmNames.Fsrs) {
