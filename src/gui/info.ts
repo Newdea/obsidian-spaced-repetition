@@ -14,7 +14,7 @@ export class ItemInfoModal extends Modal {
     settings: SRSettings;
     file: TFile;
     item: RepetitionItem;
-    nextReview: number;
+    mnextReview: Map<number, number> = new Map();
     lastInterval: number;
 
     constructor(plugin: SRPlugin, file: TFile, item: RepetitionItem = null) {
@@ -128,11 +128,10 @@ export class ItemInfoModal extends Modal {
             if (key != "data") {
                 if (key === "nextReview") {
                     new Setting(contentdiv).setDesc(key).addText((text) => {
-                        this.nextReview = undefined;
                         const dt = window.moment(item.nextReview).format("YYYY-MM-DD HH:mm:ss");
                         text.setValue(dt).onChange((value) => {
                             const nr = window.moment(value).valueOf();
-                            this.nextReview = nr ?? 0;
+                            this.mnextReview.set(item.ID, nr ?? 0);
                         });
                     });
                 } else {
@@ -168,14 +167,21 @@ export class ItemInfoModal extends Modal {
         const item = this.item;
         console.debug(this);
         const algo = this.settings.algorithm;
-        if (this.nextReview) {
-            const nr = window.moment(this.nextReview).valueOf();
-            this.nextReview = nr ?? 0;
-            item.nextReview = this.nextReview > 0 ? this.nextReview : item.nextReview;
-            if (algo === algorithmNames.Fsrs) {
-                const data = item.data as FsrsData;
-                data.due = new Date(item.nextReview);
-            }
+        if (this.mnextReview.size > 0) {
+            this.mnextReview.forEach((v, id) => {
+                const item = this.store.getItembyID(id);
+                console.log(
+                    `update item priority from ${item.nextReview} to ${v}, current item info:`,
+                    item,
+                );
+                const nr = window.moment(v).valueOf() ?? 0;
+                item.nextReview = nr > 0 ? nr : item.nextReview;
+
+                if (algo === algorithmNames.Fsrs) {
+                    const data = item.data as FsrsData;
+                    data.due = new Date(item.nextReview);
+                }
+            });
         }
         // item.nextReview= this.nextReview?this.nextReview:item.nextReview;
         if (algo !== algorithmNames.Fsrs) {
