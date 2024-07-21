@@ -97,6 +97,12 @@ export class FsrsAlgorithm extends SrsAlgorithm {
     updateSettings(settings: unknown) {
         this.settings = MiscUtils.assignOnly(this.defaultSettings(), settings);
         SrsAlgorithm.instance = this;
+        if (this.settings.w.length !== this.defaultSettings().w.length) {
+            const errmsg =
+                "fsrs algothrim has been updated, please update w of algorithm setting. reset `w` to default will fix this error";
+            console.error(errmsg);
+            new Notice(errmsg, 0);
+        }
         this.updateFsrsParams();
         this.getLogfilepath();
     }
