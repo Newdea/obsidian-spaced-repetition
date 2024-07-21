@@ -28,7 +28,6 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 -   Setting: Card index uses BlockID, which appends BlockID (e.g. `^blkid1`) to the card text, **will modify the original notes file**. Off by default, but card index may not be accurate enough;
 -   Setting: Mix ondue and new notes queue when reviewing(default: 3 ondue notes, then 2 new notes);
 
-
 ## Maintainers Wanted
 
 Since I am not a programmer, I don't know much about typescript programming, so I can only do some bug fixes and small feature updates. I can only do some bug fixes and small feature updates, but it is difficult to realize some of the proposed features. Welcome to join us if you are interested in this plugin, and work together to maintain and update this plugin.
