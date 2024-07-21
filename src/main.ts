@@ -163,7 +163,7 @@ export default class SRPlugin extends Plugin {
             this.saveReviewResponse_onNote.bind(this),
         );
         ReviewView.create(this, this.data.settings);
-        MixQueSet.create();
+        MixQueSet.create(settings.mixDue, settings.mixNew);
         this.commands = new Commands(this);
         this.commands.addCommands();
         if (this.data.settings.showDebugMessages) {

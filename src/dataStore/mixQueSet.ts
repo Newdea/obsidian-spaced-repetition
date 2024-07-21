@@ -38,6 +38,8 @@ export class MixQueSet implements IMixQueSet {
     }
 
     calcNext(dueCnthad: number, newCnthad: number) {
+        if (this.DueDefaultCnt === 0) return (this.isDue = newCnthad > 0 ? false : true);
+        if (this.NewDefaultCnt === 0) return (this.isDue = dueCnthad > 0 ? true : false);
         this._dnCnt++;
         if (this.isDue) {
             if (this._dnCnt >= this.DueDefaultCnt && newCnthad > 0) {
