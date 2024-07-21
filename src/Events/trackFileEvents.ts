@@ -3,6 +3,7 @@ import { DataLocation } from "src/dataStore/dataLocation";
 import SRPlugin from "src/main";
 
 export function registerTrackFileEvents(plugin: SRPlugin) {
+    const settings = plugin.data.settings;
     plugin.registerEvent(
         plugin.app.vault.on("rename", async (file, old) => {
             const trackFile = plugin.store.getTrackedFile(old);
@@ -24,6 +25,9 @@ export function registerTrackFileEvents(plugin: SRPlugin) {
         plugin.app.vault.on("modify", async (file: TFile) => {
             if (file.extension === "md") {
                 if (plugin.data.settings.dataLocation === DataLocation.SaveOnNoteFile) {
+                    return;
+                }
+                if (settings.cardBlockID) {
                     return;
                 }
                 if (plugin.store.isTrackedCardfile(file.path)) {

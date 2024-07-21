@@ -370,6 +370,31 @@ Q3::A3
         expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/science");
     });
 
+    test("SingleLineBasic: Note topic applies to all questions when trackedNoteToDecks", async () => {
+        let noteText: string = `
+Q1::A1
+Q2::A2
+Q3::A3
+`;
+        let noteFile: ISRFile = new UnitTestSRFile(noteText);
+
+        let folderTopicPath: TopicPath = new TopicPath(["flashcards", "science"]);
+        let settings_trackedNoteToDecks: SRSettings = { ...DEFAULT_SETTINGS };
+        settings_trackedNoteToDecks.trackedNoteToDecks = true;
+        let parser_trackedNoteToDecks: NoteQuestionParser = createTest_NoteQuestionParser(
+            settings_trackedNoteToDecks,
+        );
+        let questionList: Question[] = await parser_trackedNoteToDecks.createQuestionList(
+            noteFile,
+            folderTopicPath,
+            true,
+        );
+        expect(questionList.length).toEqual(3);
+        expect(questionList[0].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[1].topicPathList.formatPsv()).toEqual("#flashcards/science");
+        expect(questionList[2].topicPathList.formatPsv()).toEqual("#flashcards/science");
+    });
+
     test("SingleLineBasic: Tags within frontmatter applies to all questions when not overriden", async () => {
         let noteText: string = `---
 sr-due: 2024-01-17

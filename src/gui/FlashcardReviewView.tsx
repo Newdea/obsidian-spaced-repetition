@@ -21,7 +21,7 @@ import { SrTFile } from "src/SRFile";
 import { ItemInfoModal } from "./info";
 import { setDueDates } from "src/algorithms/balance/balance";
 import { DataLocation } from "src/dataStore/dataLocation";
-import { debug } from "src/util/utils_recall";
+import { BlockUtils, debug } from "src/util/utils_recall";
 
 export class FlashcardReviewView {
     public app: App;
@@ -381,7 +381,6 @@ export class FlashcardReviewView {
         const opt = algo.srsOptions()[response];
         const store = this.plugin.store;
         const id = this._currentCard.Id;
-
         store.updateReviewedCounts(id, RPITEMTYPE.CARD);
         store.reviewId(id, opt);
         store.save();

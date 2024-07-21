@@ -154,6 +154,9 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
                 // Update the source file with the updated schedule
                 await this.currentQuestion.writeQuestion(this.settings);
             }
+        }else if(this.settings.cardBlockID && !this.currentQuestion.questionText.obsidianBlockId) {
+            // Update the source file with the updated block id
+            await this.currentQuestion.writeQuestion(this.settings);
         }
 
         // Move/delete the card

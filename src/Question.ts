@@ -94,6 +94,7 @@ export class QuestionText {
     //      Block identifiers can only consist of letters, numbers, and dashes.
     // If present, then first character is "^"
     obsidianBlockId: string;
+    genBlockId?: string;
 
     // Hash of string  (topicPath + actualQuestion)
     // Explicitly excludes the HTML comment with the scheduling info
@@ -235,10 +236,19 @@ export class Question {
 
     formatForNote(settings: SRSettings): string {
         let result: string = this.questionText.formatTopicAndQuestion();
+        let blockId: string = this.questionText.obsidianBlockId;
         if (settings.dataLocation !== DataLocation.SaveOnNoteFile) {
+            if (settings.cardBlockID && !blockId) {
+                blockId = this.questionText.obsidianBlockId = this.questionText.genBlockId;
+            }
+            if (blockId) {
+                this.questionText.original += "\n";
+                if (this.isCardCommentsOnSameLine(settings)) result += ` ${blockId}\n`;
+                else result += `\n${blockId}\n`;
+            }
+
             return result;
         }
-        const blockId: string = this.questionText.obsidianBlockId;
         const hasSchedule: boolean = this.cards.some((card) => card.hasSchedule);
         if (hasSchedule) {
             result = result.trimEnd();
@@ -258,13 +268,12 @@ export class Question {
     }
 
     updateQuestionText(noteText: string, settings: SRSettings): string {
-        const originalText: string = this.questionText.original;
-
         // Get the entire text for the question including:
         //      1. the topic path (if present),
         //      2. the question text
         //      3. the schedule HTML comment (if present)
         const replacementText = this.formatForNote(settings);
+        const originalText: string = this.questionText.original;
 
         let newText = MultiLineTextFinder.findAndReplace(noteText, originalText, replacementText);
         if (newText) {

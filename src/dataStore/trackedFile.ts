@@ -41,13 +41,20 @@ export class CardInfo {
      */
     cardTextHash: string;
     /**
+     * @type {string}
+     */
+    blockID?: string;
+    /**
      * @type {number[]}
      */
     itemIds: number[];
 
-    constructor(lineNo: number = -1, cardTextHash: string = "") {
+    constructor(lineNo: number = -1, cardTextHash: string = "", blockid?: string) {
         this.lineNo = lineNo;
         this.cardTextHash = cardTextHash;
+        if (blockid) {
+            this.blockID = blockid;
+        }
         this.itemIds = [];
     }
 }
@@ -108,8 +115,8 @@ export class TrackedFile implements ITrackedFile {
      * @param cardTextHash
      * @returns {CardInfo} cardinfo | null: didn't have cardInfo
      */
-    getSyncCardInfo(lineNo: number, cardTextHash?: string): CardInfo {
-        const cardinfo = this.getCardInfo(lineNo, cardTextHash);
+    getSyncCardInfo(lineNo: number, cardTextHash?: string, blockID?: string): CardInfo {
+        const cardinfo = this.getCardInfo(lineNo, cardTextHash, blockID);
         if (cardinfo !== null) {
             if (cardinfo.lineNo !== lineNo) {
                 cardinfo.lineNo = lineNo;
@@ -118,6 +125,9 @@ export class TrackedFile implements ITrackedFile {
             if (cardTextHash != undefined && cardinfo.cardTextHash !== cardTextHash) {
                 cardinfo.cardTextHash = cardTextHash;
                 // console.debug("syncCardInfo, change hash");
+            }
+            if (blockID != undefined && cardinfo.blockID !== blockID) {
+                cardinfo.blockID = blockID;
             }
         }
         return cardinfo;
@@ -128,12 +138,19 @@ export class TrackedFile implements ITrackedFile {
      * @param cardTextHash
      * @returns {CardInfo} cardinfo | null: didn't have cardInfo
      */
-    getCardInfo(lineNo: number, cardTextHash?: string): CardInfo {
+    getCardInfo(lineNo: number, cardTextHash?: string, blockID?: string): CardInfo {
         let cardind = -2;
         if (this.cardItems != undefined) {
-            cardind = this.cardItems.findIndex((cinfo, _ind) => {
-                return cardTextHash != null && cinfo.cardTextHash.includes(cardTextHash);
-            });
+            if (blockID) {
+                cardind = this.cardItems.findIndex((cinfo, _ind) => {
+                    return cinfo.blockID === blockID;
+                });
+            }
+            if (cardind < 0 && cardTextHash) {
+                cardind = this.cardItems.findIndex((cinfo, _ind) => {
+                    return cinfo.cardTextHash.includes(cardTextHash);
+                });
+            }
             if (cardind < 0) {
                 cardind = this.cardItems.findIndex((cinfo, _ind) => {
                     return cinfo.lineNo === lineNo;

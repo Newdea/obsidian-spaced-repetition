@@ -77,7 +77,12 @@ export function parseEx(
             // This could be the first line of a multi line question
             firstLineNo = i;
         }
-        cardText += currentLine.trimEnd();
+        if (i + 1 < lines.length && lines[i + 1].length === 0) {
+            // keep last block line as it is for adding block id
+            cardText += currentLine;
+        } else {
+            cardText += currentLine.trimEnd();
+        }
 
         if (
             currentLine.includes(singlelineReversedCardSeparator) ||

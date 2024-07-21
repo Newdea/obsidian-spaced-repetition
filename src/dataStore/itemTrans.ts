@@ -141,11 +141,15 @@ export class ItemTrans {
             const cardText: string = question.questionText.actualQuestion;
             const lineNo: number = question.lineNo;
             const cardTextHash = BlockUtils.getTxtHash(cardText);
+            let blockID = question.questionText.obsidianBlockId;
             const count: number = question.cards.length;
             const scheduling: RegExpMatchArray[] = [];
-            let carditem = trackedFile.getSyncCardInfo(lineNo, cardTextHash);
-            if (carditem != null) {
-                carditem.itemIds
+            if (settings.cardBlockID && !blockID) {
+                blockID = question.questionText.genBlockId = "^" + BlockUtils.generateBlockId();
+            }
+            let cardinfo = trackedFile.getSyncCardInfo(lineNo, cardTextHash, blockID);
+            if (cardinfo != null) {
+                cardinfo.itemIds
                     .map((id: number) => store.getItembyID(id).getSched())
                     .filter((sched) => {
                         // ignore new add card  sched != null &&
@@ -155,17 +159,21 @@ export class ItemTrans {
                         }
                     });
             } else {
-                carditem = trackedFile.trackCard(lineNo, cardTextHash);
+                cardinfo = trackedFile.trackCard(lineNo, cardTextHash);
             }
 
             const dtppath = question.topicPathList.list[0] ?? undefined;
             let deckname = dtppath?.hasPath ? dtppath.path[0] : topicPath.path[0];
             deckname = Tags.isDefaultDackName(deckname) ? deckname : "#" + deckname;
-            store.updateCardItems(trackedFile, carditem, count, deckname, false);
-            updateCardObjs(question.cards, carditem, scheduling);
+            store.updateCardItems(trackedFile, cardinfo, count, deckname, false);
+            updateCardObjs(question.cards, cardinfo, scheduling);
 
             // update question
-            question.hasChanged = false;
+            if (question.questionText.genBlockId) {
+                question.hasChanged = true;
+            } else {
+                question.hasChanged = false;
+            }
         }
     }
 }

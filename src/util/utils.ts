@@ -44,7 +44,10 @@ export function literalStringReplace(
     replacementStr: string,
 ): string {
     let result: string = text;
-    const startIdx: number = text.indexOf(searchStr);
+    let startIdx: number = text.indexOf(searchStr);
+    if (startIdx < 0) {
+        startIdx = text.indexOf(searchStr.trimEnd());
+    }
     if (startIdx >= 0) {
         const startStr: string = text.substring(0, startIdx);
         const endIdx: number = startIdx + searchStr.length;
