@@ -67,6 +67,7 @@ import { setDueDates } from "./algorithms/balance/balance";
 import { RepetitionItem } from "./dataStore/repetitionItem";
 import { IReviewNote } from "./reviewNote/review-note";
 import { ReviewView } from "./gui/reviewView";
+import { MixQueSet } from "./dataStore/mixQueSet";
 
 interface PluginData {
     settings: SRSettings;
@@ -162,6 +163,7 @@ export default class SRPlugin extends Plugin {
             this.saveReviewResponse_onNote.bind(this),
         );
         ReviewView.create(this, this.data.settings);
+        MixQueSet.create(settings.mixDue, settings.mixNew);
         this.commands = new Commands(this);
         this.commands.addCommands();
         if (this.data.settings.showDebugMessages) {
@@ -791,9 +793,12 @@ export default class SRPlugin extends Plugin {
         this.lastSelectedReviewDeck = deckKey;
         const deck = this.reviewDecks[deckKey];
         const queue = this.store.data.queues;
+        const mqs = MixQueSet.getInstance();
         let show = false;
         let item;
         let index = -1;
+
+        mqs.calcNext(deck.dueNotesCount, deck.newNotes.length);
 
         const isPreviewUndueNote = (item: RepetitionItem) => {
             return item.nextReview > Date.now() && !item.isDue;
@@ -825,13 +830,13 @@ export default class SRPlugin extends Plugin {
             deck.dueNotesCount,
             this.data.settings.openRandomNote,
         );
-        if (index >= 0) {
+        if (mqs.isDue && index >= 0) {
             await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             item = deck.scheduledNotes[index].item;
             fShowItemInfo(item, "scheduledNoes index: " + index);
             show = true;
             // return;
-        } else if (queue.queueSize(deckKey) > 0) {
+        } else if (mqs.isDue && queue.queueSize(deckKey) > 0) {
             item = this.store.getNext(deckKey);
             fShowItemInfo(item, "queue");
             const path = this.store.getFilePath(item);
@@ -843,7 +848,8 @@ export default class SRPlugin extends Plugin {
             } else {
                 queue.remove(item, queue.queue[deckKey]);
             }
-        } else if (deck.newNotes.length > 0) {
+        }
+        if (!mqs.isDue && deck.newNotes.length > 0) {
             const index = this.data.settings.openRandomNote
                 ? Math.floor(Math.random() * deck.newNotes.length)
                 : 0;

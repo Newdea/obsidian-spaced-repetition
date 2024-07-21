@@ -19,6 +19,7 @@ import { addUntrackSetting, addTrackedNoteToDecksSetting } from "./settings/trac
 import { buildDonation } from "./settings/donation";
 import { addburySiblingSetting } from "./settings/burySiblingSetting";
 import { addcardBlockIDSetting } from "./settings/cardBlockIDSetting";
+import { addmixQueueSetting } from "./settings/mixQueueSetting";
 
 export interface SRSettings {
     // flashcards
@@ -54,6 +55,8 @@ export interface SRSettings {
     noteFoldersToIgnore: string[];
     openRandomNote: boolean;
     autoNextNote: boolean;
+    mixDue: number;
+    mixNew: number;
     reviewResponseFloatBar: boolean;
     responseBarPositionPercentage: number;
     reviewingNoteDirectly: boolean;
@@ -119,6 +122,8 @@ export const DEFAULT_SETTINGS: SRSettings = {
     noteFoldersToIgnore: [],
     openRandomNote: false,
     autoNextNote: false,
+    mixDue: 3,
+    mixNew: 2,
     reviewResponseFloatBar: false,
     responseBarPositionPercentage: 5,
     reviewingNoteDirectly: false,
@@ -582,6 +587,7 @@ export class SRSettingTab extends PluginSettingTab {
             }),
         );
 
+        addmixQueueSetting(containerEl.createDiv(), this.plugin);
         addTrackedNoteToDecksSetting(containerEl.createDiv(), this.plugin);
         addUntrackSetting(containerEl.createDiv(), this.plugin);
         addResponseFloatBarSetting(containerEl.createDiv(), this.plugin);
