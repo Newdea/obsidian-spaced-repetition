@@ -26,6 +26,8 @@ This is a modified version of [obsidian-spaced-repetition](https://github.com/st
 -   support multi-clozes;
 -   setting `burySiblingCards` split into `burySiblingCards`(origin) and `burySiblingCardsByNoteReview`, and multi-clozes will not be buried;
 -   Setting: Card index uses BlockID, which appends BlockID (e.g. `^blkid1`) to the card text, **will modify the original notes file**. Off by default, but card index may not be accurate enough;
+-   Setting: Mix ondue and new notes queue when reviewing(default: 3 ondue notes, then 2 new notes);
+
 
 ## Maintainers Wanted
 
