@@ -434,7 +434,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     });
             })
             .settingEl.querySelector(".setting-item-description").innerHTML =
-            '查阅 <a href= "https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm"> FSRS V4 WIKI </a> 和\
+            '查阅 <a href= "https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm"> FSRS V5 WIKI </a> 和\
             <a href= "https://open-spaced-repetition.github.io/anki_fsrs_visualizer"> FSRS w参数可视化 </a> \
             以对各参数进行设置.';
 

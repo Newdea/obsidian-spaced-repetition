@@ -80,8 +80,8 @@ devDependencies:
     specifier: ^3.3.2
     version: 3.3.2
   ts-fsrs:
-    specifier: ^3.5.7
-    version: 3.5.7
+    specifier: ^4.1.2
+    version: 4.1.2
   ts-jest:
     specifier: ^29.1.5
     version: 29.1.5(@babel/core@7.24.7)(esbuild@0.19.12)(jest@29.7.0)(typescript@5.1.6)
@@ -5383,10 +5383,6 @@ packages:
       xmlchars: 2.2.0
     dev: true
 
-  /seedrandom@3.0.5:
-    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
-    dev: true
-
   /semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
@@ -5771,11 +5767,9 @@ packages:
       typescript: 5.1.6
     dev: true
 
-  /ts-fsrs@3.5.7:
-    resolution: {integrity: sha512-xA18Igi1adkuCNgNjKkorjYgZq842+HdgRjatQPDERcrAWMlzM+3BwIbrF/Q0ijYEyw3NcTp3yJIMSO7agBLKQ==}
-    engines: {node: '>=16.0.0'}
-    dependencies:
-      seedrandom: 3.0.5
+  /ts-fsrs@4.1.2:
+    resolution: {integrity: sha512-sHmx2m+RWG48zMbkwAfZ3NHJwuTNd2HvgtsrERJzGuQVeSTguN1V+rBeSCP47r0JusWK1Etu/+BJT63OIwMauw==}
+    engines: {node: '>=18.0.0'}
     dev: true
 
   /ts-jest@29.1.5(@babel/core@7.24.7)(esbuild@0.19.12)(jest@29.7.0)(typescript@5.1.6):
