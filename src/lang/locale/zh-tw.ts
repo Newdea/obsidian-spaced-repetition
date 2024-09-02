@@ -158,12 +158,11 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_INTERVAL_MIN_WARNING: "最大間隔至少為1天",
     MAX_LINK_CONTRIB: "最大鏈接貢獻",
     MAX_LINK_CONTRIB_DESC: "鏈接筆記的加權掌握程度對原始掌握程度的最大貢獻。",
-    FUZZING: "Fuzzing",
-    FUZZING_DESC:
-        "When enabled, this adds a small random delay to the new interval time to prevent cards from sticking together and always being reviewed on the same day.",
-    SWITCH_SHORT_TERM: "Switch to Short-term Scheduler",
+    FUZZING: "均衡",
+    FUZZING_DESC: "啟用時, 會給新間隔添加個較小的隨機延遲，以免卡片總被堆積在同一天復習。",
+    SWITCH_SHORT_TERM: "短期排程",
     SWITCH_SHORT_TERM_DESC:
-        "When disabled, this allow user to skip the short-term scheduler and directly switch to the long-term scheduler.",
+        "禁用時，可讓用戶跳過短期排程(如5分鐘、10分鐘)，直接切換到長期排程（如3天、5天）。",
     LOGGING: "記錄中",
     DISPLAY_DEBUG_INFO: "在開發者控制台中顯示除錯資訊",
     DISPLAY_PARSER_DEBUG_INFO:
