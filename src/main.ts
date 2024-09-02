@@ -142,6 +142,7 @@ export default class SRPlugin extends Plugin {
 
     async onload(): Promise<void> {
         SRPlugin._instance = this;
+        Iadapter.create(this.app);
         await this.loadPluginData();
         this.easeByPath = new NoteEaseList(this.data.settings);
         this.questionPostponementList = new QuestionPostponementList(
@@ -157,7 +158,6 @@ export default class SRPlugin extends Plugin {
         if (isVersionNewerThanOther(PLUGIN_VERSION, this.data.settings.previousRelease)) {
             new ReleaseNotes(this.app, this, obsidianJustInstalled ? null : PLUGIN_VERSION).open();
         }
-        Iadapter.create(this.app);
 
         const settings = this.data.settings;
         this.algorithm = algorithms[settings.algorithm];
@@ -188,7 +188,15 @@ export default class SRPlugin extends Plugin {
         registerTrackFileEvents(this);
 
         if (this.data.settings.dataLocation !== DataLocation.SaveOnNoteFile) {
-            this.registerInterval(window.setInterval(() => this.store.save(), 5 * 60 * 1000));
+            this.registerInterval(
+                window.setInterval(
+                    async () => {
+                        await this.sync();
+                        this.store.save();
+                    },
+                    5 * 60 * 1000,
+                ),
+            );
         }
 
         this.statusBar = this.addStatusBarItem();
@@ -867,11 +875,11 @@ export default class SRPlugin extends Plugin {
             }
         };
 
-        index = IReviewNote.getNextDueNoteIndex(
-            deck.dueNotesCount,
-            this.data.settings.openRandomNote,
-        );
-        if (mqs.isDue && index >= 0) {
+        if (mqs.isDue && deck.dueNotesCount > 0) {
+            index = IReviewNote.getNextNoteIndex(
+                deck.dueNotesCount,
+                this.data.settings.openRandomNote,
+            );
             await this.app.workspace.getLeaf().openFile(deck.scheduledNotes[index].note);
             item = deck.scheduledNotes[index].item;
             fShowItemInfo(item, "scheduledNoes index: " + index);
@@ -891,9 +899,10 @@ export default class SRPlugin extends Plugin {
             }
         }
         if (!mqs.isDue && deck.newNotes.length > 0) {
-            const index = this.data.settings.openRandomNote
-                ? Math.floor(Math.random() * deck.newNotes.length)
-                : 0;
+            const index = IReviewNote.getNextNoteIndex(
+                deck.newNotes.length,
+                this.data.settings.openRandomNote,
+            );
             await this.app.workspace.getLeaf().openFile(deck.newNotes[index].note);
             item = deck.newNotes[index].item;
             fShowItemInfo(item, "newNotes index:" + index);
