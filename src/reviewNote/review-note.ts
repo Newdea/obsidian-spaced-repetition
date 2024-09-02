@@ -135,16 +135,13 @@ export abstract class IReviewNote {
         }
     }
 
-    static getNextDueNoteIndex(NotesCount: number, openRandomNote: boolean = false) {
-        let index = -1;
+    static getNextNoteIndex(NotesCount: number, openRandomNote: boolean = false) {
+        let index = 0;
 
-        if (NotesCount < 1) {
-            return -1;
-        }
         if (!openRandomNote) {
             return 0;
         } else {
-            index = Math.floor(Math.random() * NotesCount);
+            index = Math.floor(Math.random() * (NotesCount - 0.1)); // avoid conner case: index == notesCount;
         }
         return index;
     }
