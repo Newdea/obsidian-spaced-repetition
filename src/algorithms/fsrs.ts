@@ -446,8 +446,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             .addToggle((toggle) =>
                 toggle.setValue(this.settings.enable_fuzz).onChange(async (value) => {
                     applySettingsUpdate(async () => {
-                        this.settings.enable_fuzz =
-                            value ?? this.defaultSettings().enable_fuzz;
+                        this.settings.enable_fuzz = value ?? this.defaultSettings().enable_fuzz;
                         update(this.settings, true);
                         this.updateFsrsParams();
                     });
@@ -459,8 +458,7 @@ export class FsrsAlgorithm extends SrsAlgorithm {
                     .setTooltip(t("RESET_DEFAULT"))
                     .onClick(async () => {
                         applySettingsUpdate(async () => {
-                            this.settings.enable_fuzz =
-                                this.defaultSettings().enable_fuzz;
+                            this.settings.enable_fuzz = this.defaultSettings().enable_fuzz;
                             update(this.settings, true);
                             this.updateFsrsParams();
                         });
