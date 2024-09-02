@@ -55,6 +55,7 @@ interface FsrsSettings {
     maximum_interval: number;
     w: number[];
     enable_fuzz: boolean;
+    enable_short_term: boolean;
 }
 
 const FsrsOptions: string[] = ["Again", "Hard", "Good", "Easy"]; // Manual =0
@@ -438,6 +439,60 @@ export class FsrsAlgorithm extends SrsAlgorithm {
             '查阅 <a href= "https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm"> FSRS V5 WIKI </a> 和\
             <a href= "https://open-spaced-repetition.github.io/anki_fsrs_visualizer"> FSRS w参数可视化 </a> \
             以对各参数进行设置.';
+
+        new Setting(containerEl)
+            .setName(t("FUZZING"))
+            .setDesc(t("FUZZING_DESC"))
+            .addToggle((toggle) =>
+                toggle.setValue(this.settings.enable_fuzz).onChange(async (value) => {
+                    applySettingsUpdate(async () => {
+                        this.settings.enable_fuzz =
+                            value ?? this.defaultSettings().enable_fuzz;
+                        update(this.settings, true);
+                        this.updateFsrsParams();
+                    });
+                }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        applySettingsUpdate(async () => {
+                            this.settings.enable_fuzz =
+                                this.defaultSettings().enable_fuzz;
+                            update(this.settings, true);
+                            this.updateFsrsParams();
+                        });
+                    });
+            });
+
+        new Setting(containerEl)
+            .setName(t("SWITCH_SHORT_TERM"))
+            .setDesc(t("SWITCH_SHORT_TERM_DESC"))
+            .addToggle((toggle) =>
+                toggle.setValue(this.settings.enable_short_term).onChange(async (value) => {
+                    applySettingsUpdate(async () => {
+                        this.settings.enable_short_term =
+                            value ?? this.defaultSettings().enable_short_term;
+                        update(this.settings, true);
+                        this.updateFsrsParams();
+                    });
+                }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        applySettingsUpdate(async () => {
+                            this.settings.enable_short_term =
+                                this.defaultSettings().enable_short_term;
+                            update(this.settings, true);
+                            this.updateFsrsParams();
+                        });
+                    });
+            });
 
         return;
     }
