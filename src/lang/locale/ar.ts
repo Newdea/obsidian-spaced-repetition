@@ -168,6 +168,12 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_INTERVAL_MIN_WARNING: "يجب أن يكون الحد الأقصى للفاصل الزمني لمدة يوم واحد على الأقل.",
     MAX_LINK_CONTRIB: "أقصى مساهمة ارتباط",
     MAX_LINK_CONTRIB_DESC: "أقصى مساهمة للسهولة المرجحة للملاحظات المرتبطة بالسهولة الأولية.",
+    FUZZING: "Fuzzing",
+    FUZZING_DESC:
+        "When enabled, this adds a small random delay to the new interval time to prevent cards from sticking together and always being reviewed on the same day.",
+    SWITCH_SHORT_TERM: "Switch to Short-term Scheduler",
+    SWITCH_SHORT_TERM_DESC:
+        "When disabled, this allow user to skip the short-term scheduler and directly switch to the long-term scheduler.",
     LOGGING: "تسجيل",
     DISPLAY_DEBUG_INFO: "عرض معلومات التصحيح على وحدة تحكم المطور",
     DISPLAY_PARSER_DEBUG_INFO:

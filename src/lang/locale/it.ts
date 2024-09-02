@@ -181,6 +181,12 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB: "Contributo massimo delle note collegate",
     MAX_LINK_CONTRIB_DESC:
         "Contributo massimo della difficoltà pasata delle note collegate alla difficoltà iniziale.",
+    FUZZING: "Fuzzing",
+    FUZZING_DESC:
+        "When enabled, this adds a small random delay to the new interval time to prevent cards from sticking together and always being reviewed on the same day.",
+    SWITCH_SHORT_TERM: "Switch to Short-term Scheduler",
+    SWITCH_SHORT_TERM_DESC:
+        "When disabled, this allow user to skip the short-term scheduler and directly switch to the long-term scheduler.",
     LOGGING: "Registrando",
     DISPLAY_DEBUG_INFO: "Visualizza informazione di debug sulla console per sviluppatori",
     DISPLAY_PARSER_DEBUG_INFO:

@@ -172,6 +172,12 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB: "Maximální příspěvěk prolinkování",
     MAX_LINK_CONTRIB_DESC:
         "Maximální příspěvek vážené složitosti prolinkovaných poznámek použitý pro určení počáteční složitosti.",
+    FUZZING: "Fuzzing",
+    FUZZING_DESC:
+        "When enabled, this adds a small random delay to the new interval time to prevent cards from sticking together and always being reviewed on the same day.",
+    SWITCH_SHORT_TERM: "Switch to Short-term Scheduler",
+    SWITCH_SHORT_TERM_DESC:
+        "When disabled, this allow user to skip the short-term scheduler and directly switch to the long-term scheduler.",
     LOGGING: "Zaznamenávám",
     DISPLAY_DEBUG_INFO: "Zobrazit informace pro ladění na vývojářské konzoli",
     DISPLAY_PARSER_DEBUG_INFO:

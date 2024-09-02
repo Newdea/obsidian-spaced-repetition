@@ -173,6 +173,12 @@ Note that this setting is common to both Flashcards and Notes.`,
     MAX_LINK_CONTRIB: "최대 연결 기여도",
     MAX_LINK_CONTRIB_DESC:
         "링크된 노트의 초기 ease에 대한 가중치가 적용된 ease의 최대 기여도입니다.",
+    FUZZING: "Fuzzing",
+    FUZZING_DESC:
+        "When enabled, this adds a small random delay to the new interval time to prevent cards from sticking together and always being reviewed on the same day.",
+    SWITCH_SHORT_TERM: "Switch to Short-term Scheduler",
+    SWITCH_SHORT_TERM_DESC:
+        "When disabled, this allow user to skip the short-term scheduler and directly switch to the long-term scheduler.",
     LOGGING: "로깅",
     DISPLAY_DEBUG_INFO: "디버깅 정보를 개발자 콘솔에 표시하시겠습니까",
     DISPLAY_PARSER_DEBUG_INFO:
