@@ -86,7 +86,7 @@ main
 /* The input text to the parser contains arbitrary text, not just card definitions. 
   Hence we fallback to matching on loose_line. The result from loose_line is filtered out by filterBlocks() */  
 block
-  = html_comment / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / loose_line
+  = html_comment / inline_rev_card / inline_card / multiline_rev_card / multiline_card / close_card / backprime_code_line / loose_line
 
 html_comment
   = $("<!--" (!"-->" (html_comment / .))* "-->" newline?) {
@@ -127,7 +127,7 @@ multiline
   }
   
 multiline_before
-  = $(!multiline_mark nonempty_text_line)+
+  = $(!multiline_mark (tilde_code / backprime_code / nonempty_text_line ))+
 
 multiline_after
   = $(!separator_line (tilde_code / backprime_code / text_line))+
@@ -142,6 +142,11 @@ tilde_code
   
 tilde_marker
   = "~~~" "~"*
+
+backprime_code_line
+  = $(backprime_code) {
+    return createParsedQuestionInfo(CardType.Ignore,"",location().start.line-1,location().end.line-2);
+  }
 
 backprime_code
   = $(
@@ -177,7 +182,7 @@ close_line
   = ((!close_text non_newline)* close_text) text_line_nonterminated?
   
 multiline_before_close
-  = (!close_line nonempty_text_line)+
+  = (!close_line !backprime_marker nonempty_text_line)+
 
 multiline_after_close
   = e:(!(newline separator_line) text_line1)+
