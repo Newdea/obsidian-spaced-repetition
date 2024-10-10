@@ -166,10 +166,10 @@ export class ItemTrans {
             let deckname = dtppath?.hasPath ? dtppath.path[0] : topicPath.path[0];
             deckname = Tags.isDefaultDackName(deckname) ? deckname : "#" + deckname;
             store.updateCardItems(trackedFile, cardinfo, count, deckname, false);
-            updateCardObjs(question.cards, cardinfo, scheduling);
+            const update = updateCardObjs(question.cards, cardinfo, scheduling);
 
             // update question
-            if (question.questionText.genBlockId) {
+            if (question.questionText.genBlockId && update) {
                 question.hasChanged = true;
             } else {
                 question.hasChanged = false;
@@ -182,14 +182,18 @@ function updateCardObjs(cards: Card[], cardinfo: CardInfo, scheduling: RegExpMat
     const schedInfoList: CardScheduleInfo[] =
         NoteCardScheduleParser.createInfoList_algo(scheduling);
     const carditemIds = cardinfo.itemIds;
+    let update = false;
     for (let i = 0; i < cards.length; i++) {
         const cardObj = cards[i];
         const hasScheduleInfo: boolean = i < schedInfoList.length;
         const schedule: CardScheduleInfo = schedInfoList[i];
-        cardObj.scheduleInfo =
-            hasScheduleInfo && !schedule.isDummyScheduleForNewCard() ? schedule : null;
+        const hassched = !schedule.isDummyScheduleForNewCard();
+        cardObj.scheduleInfo = hasScheduleInfo && hassched ? schedule : null;
         cardObj.Id = carditemIds[i];
+
+        if (hassched) update = true;
     }
+    return update;
 }
 
 export function itemToShedNote(item: RepetitionItem, note: TFile): SchedNote {
