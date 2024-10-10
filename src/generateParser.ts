@@ -248,7 +248,7 @@ loose_line
     }
 
 annotation
-  = $("<!--SR:" (!"-->" .)+ "-->")
+  = $($("<!--SR:" (!"-->" .)+ "-->") / blockid)
     
 nonempty_text_till_newline
   = $non_newline+
@@ -270,6 +270,9 @@ nonemptyspace
 
 optional_whitespaces
   = whitespace_char*
+
+blockid
+=$([\\^][a-zA-Z0-9-]+)
 
 whitespace_char = ([ \\f\\t\\v\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff])
 `;

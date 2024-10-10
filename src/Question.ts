@@ -252,9 +252,9 @@ export class Question {
                 blockId = this.questionText.obsidianBlockId = this.questionText.genBlockId;
             }
             if (blockId) {
-                this.questionText.original += "\n";
-                if (this.isCardCommentsOnSameLine(settings)) result += ` ${blockId}\n`;
+                if (!this.questionText.original.endsWith("```")) result += ` ${blockId}\n`;
                 else result += `\n${blockId}\n`;
+                this.questionText.original += "\n";
             }
 
             return result;
