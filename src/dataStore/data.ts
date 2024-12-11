@@ -484,67 +484,34 @@ export class DataStore {
      * @returns {number}
      */
     untrackFile(path: string, notice?: boolean): number {
-        if (notice == null) notice = true;
-
-        const index = this.getFileIndex(path);
-
-        if (index == -1) {
-            return 0;
-        }
-
         const trackedFile = this.getTrackedFile(path);
-        const note = Iadapter.instance.vault.getAbstractFileByPath(path) as TFile;
-        let cardName: string = null;
-
-        if (note != null && trackedFile.tags.length > 0) {
-            const fileCachedData = Iadapter.instance.metadataCache.getFileCache(note) || {};
-            const tags = getAllTags(fileCachedData) || [];
-            const deckname = Tags.getNoteDeckName(note, this.settings);
-            cardName = Tags.getTagFromSettingTags(tags, this.settings.flashcardTags);
-            if (deckname !== null || this.settings.convertFoldersToDecks) {
-                // || cardName !== null
-                // it's taged file, can't untrack by this.
-                console.log(path + " is taged file, can't untrack by this.");
-                MiscUtils.notice(
-                    "it is taged file, can't untrack by this. You can delete the #review tag in note file.",
-                );
-                return 0;
-            }
-        }
-
+        if (!trackedFile) return 0;
+        
         let numItems = 0;
         const lastTag = trackedFile.lastTag;
-        trackedFile.setUnTracked();
+        
+        // Remove items
         for (const key in trackedFile.items) {
             const id = trackedFile.items[key];
             if (id >= 0) {
-                this.unTrackItem(id);
+                delete this.data.items[id];  // Actually remove the item
                 numItems++;
             }
         }
-        if (cardName == null && this.settings.trackedNoteToDecks) {
-            trackedFile.cardIDs.filter((id) => id >= 0).forEach(this.unTrackItem, this);
-            numItems += trackedFile.cardIDs.length;
+        
+        // Remove the tracked file entry
+        const index = this.data.trackedFiles.findIndex(f => f.path === path);
+        if (index !== -1) {
+            this.data.trackedFiles.splice(index, 1);
         }
-
-        let nulrstr: string = "";
-        // this.data.trackedFiles[index] = null;
-        if (note == null) {
-            nulrstr = ", because it not exist.";
-        } else if (
-            this.settings.tagsToReview.includes(lastTag) &&
-            this.settings.untrackWithReviewTag
-        ) {
-            nulrstr = ", because you have delete the reviewTag in note.";
-        }
-        // this.save();         // will be used when plugin.sync_Algo(), which shouldn't
-        // this.plugin.updateStatusBar();
+        
+        // Save changes
+        this.save();
 
         if (notice) {
-            MiscUtils.notice("Untracked " + numItems + " items" + nulrstr);
+            MiscUtils.notice("Untracked " + numItems + " items");
         }
 
-        console.log("Untracked: " + path + nulrstr);
         return numItems;
     }
 
@@ -855,5 +822,22 @@ export class DataStore {
                 " nullitem(s).",
         );
         return;
+    }
+
+    getItemByPath(path: string): RepetitionItem | null {
+        // Find item by path in the store
+        return this.data.items.find(item => (item as any).path === path) || null;
+    }
+
+    removeItem(item: RepetitionItem): void {
+        // Remove item from the store
+        const index = this.data.items.indexOf(item);
+        if (index > -1) {
+            this.data.items.splice(index, 1);
+        }
+        // Also remove from any queues
+        Object.values(this.data.queues).forEach(queue => {
+            queue.remove(item);
+        });
     }
 }
