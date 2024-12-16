@@ -139,7 +139,6 @@ export default class SRPlugin extends Plugin {
     }
 
     private debouncedGenerateParserTimeout: number | null = null;
-    private isViewRegistered = false;
 
     async onload(): Promise<void> {
         SRPlugin._instance = this;
@@ -1015,7 +1014,6 @@ export default class SRPlugin extends Plugin {
 
     private async openReviewQueueView() {
         let reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
-        
         if (reviewQueueLeaf == null) {
             await this.activateReviewQueueViewPanel();
             reviewQueueLeaf = this.getActiveLeaf(REVIEW_QUEUE_VIEW_TYPE);
@@ -1024,10 +1022,6 @@ export default class SRPlugin extends Plugin {
         if (reviewQueueLeaf !== null) {
             this.app.workspace.revealLeaf(reviewQueueLeaf);
             this.updateAndSortDueNotes();
-            
-            if (this.reviewQueueView) {
-                this.reviewQueueView.redraw();
-            }
         }
     }
 
