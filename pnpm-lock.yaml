@@ -35,11 +35,11 @@ devDependencies:
     specifier: ^6.21.0
     version: 6.21.0(eslint@8.57.0)(typescript@5.1.6)
   '@wdio/cli':
-    specifier: ^8.40.5
-    version: 8.40.5
+    specifier: ^9.4.1
+    version: 9.4.1
   '@wdio/local-runner':
-    specifier: ^8.40.5
-    version: 8.40.5
+    specifier: ^9.4.1
+    version: 9.4.1
   '@wdio/mocha-framework':
     specifier: ^8.40.3
     version: 8.40.3
