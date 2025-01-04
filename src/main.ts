@@ -989,9 +989,12 @@ export default class SRPlugin extends Plugin {
     }
 
     private async initReviewQueueView() {
+        // Unregister existing view first to prevent duplicates
+        this.app.workspace.detachLeavesOfType(REVIEW_QUEUE_VIEW_TYPE);
+
         this.registerView(
             REVIEW_QUEUE_VIEW_TYPE,
-            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this)),
+            (leaf) => (this.reviewQueueView = new ReviewQueueListView(leaf, this))
         );
 
         if (
